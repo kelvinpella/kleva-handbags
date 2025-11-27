@@ -3,15 +3,22 @@ import ProductGallery from '@/components/ProductGallery';
 import WhatsAppButton from '@/components/WhatsappButton';
 import ProductCard from '@/components/ProductCard';
 import { notFound } from 'next/navigation';
-import { Handbag } from '@/typings';
+    import { Handbag } from '@/typings';
 import Link from 'next/link';
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  const handbag = await getHandbagById(params.id);
+interface PageProps {
+  params: {
+    id: string;
+  };
+}
+
+export async function generateMetadata({ params }: PageProps) {
+  const resolvedParams = await Promise.resolve(params);
+  const handbag = await getHandbagById(resolvedParams.id);
 
   if (!handbag) {
     return {
-      title: 'Product Not Found',
+      title: 'Product Not Found - Pochi Store',
     };
   }
 
@@ -21,33 +28,37 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
   };
 }
 
-export default async function ProductPage({ params }: { params: { id: string } }) {
-  const handbag = await getHandbagById(params.id);
+export default async function ProductPage({ params }: PageProps) {
+  const resolvedParams = await Promise.resolve(params);
+  const handbag = await getHandbagById(resolvedParams.id);
 
   if (!handbag) {
+    console.log('Handbag not found, showing 404');
     notFound();
   }
 
-  const similarHandbags = await getSimilarHandbags(params.id, handbag.condition);
-  const productUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/product/${params.id}`;
+  const similarHandbags = await getSimilarHandbags(resolvedParams.id, handbag.condition);
+  const productUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/product/${resolvedParams.id}`;
 
   return (
     <div className="bg-white">
       {/* Breadcrumb */}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4 border-b border-neutral-200">
-        <nav className="flex text-xs text-neutral-600">
-          <Link href="/" className="hover:text-neutral-900">
+        <nav className="flex text-xs text-neutral-600 flex-wrap items-center">
+          <Link href="/" className="hover:text-neutral-900 transition-colors">
             Nyumbani
           </Link>
           <span className="mx-2">/</span>
           <Link
             href={handbag.condition === 'new' ? '/new-handbags' : '/second-hand'}
-            className="hover:text-neutral-900"
+            className="hover:text-neutral-900 transition-colors"
           >
             {handbag.condition === 'new' ? 'Pochi Mpya' : 'Pochi za Mtumba'}
           </Link>
           <span className="mx-2">/</span>
-          <span className="text-neutral-900 truncate">{handbag.name}</span>
+          <span className="text-neutral-900 truncate max-w-[200px] md:max-w-none">
+            {handbag.name}
+          </span>
         </nav>
       </div>
 
@@ -82,7 +93,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
             {/* Price */}
             <div className="flex items-baseline space-x-3">
               <span className="text-3xl font-bold text-red-600">
-                TSh {handbag.price.toLocaleString()}
+                TSh {handbag.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>
 
