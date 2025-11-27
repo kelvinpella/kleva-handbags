@@ -24,7 +24,7 @@ export default function NotFound() {
           Page Not Found
         </h2>
         <p className="text-neutral-600 mb-8">
-          Sorry, the page you're looking for doesn't exist. The link might be incorrect.
+          Sorry, the page you&apos;re looking for doesn&apos;t exist. The link might be incorrect.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link

@@ -24,7 +24,7 @@ export default function SocialLinks({
 }: SocialLinksProps) {
   return (
     <div className={`flex items-center gap-4 ${className}`}>
-      {links.map((link, index) => (
+      {links.map((link) => (
         <Fragment key={link.label}>
           <a
             href={link.href}
