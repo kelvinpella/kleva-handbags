@@ -21,7 +21,7 @@ export async function getHandbags(
     .range(from, to);
 
   if (error) {
-    console.error('Error fetching handbags:', error);
+    console.log('Error fetching handbags:', error);
     return { data: [], count: 0 };
   }
 
@@ -38,7 +38,7 @@ export async function getHandbagById(id: string) {
     .single();
 
   if (error) {
-    console.error('Error fetching handbag:', error);
+    console.log('Error fetching handbag:', error);
     return null;
   }
 
@@ -59,7 +59,7 @@ export async function getSimilarHandbags(
     .limit(limit);
 
   if (error) {
-    console.error('Error fetching similar handbags:', error);
+    console.log('Error fetching similar handbags:', error);
     return [];
   }
 

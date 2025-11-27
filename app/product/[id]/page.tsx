@@ -18,12 +18,12 @@ export async function generateMetadata({ params }: PageProps) {
 
   if (!handbag) {
     return {
-      title: 'Product Not Found - Pochi Store',
+      title: 'Product Not Found - Kleva Handbags',
     };
   }
 
   return {
-    title: `${handbag.name} - Pochi Store`,
+    title: `${handbag.name} - Kleva Handbags`,
     description: handbag.description,
   };
 }
@@ -39,21 +39,22 @@ export default async function ProductPage({ params }: PageProps) {
 
   const similarHandbags = await getSimilarHandbags(resolvedParams.id, handbag.condition);
   const productUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/product/${resolvedParams.id}`;
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || handbag.whatsapp_number;
 
   return (
     <div className="bg-white">
       {/* Breadcrumb */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4 border-b border-neutral-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 border-b border-neutral-200">
         <nav className="flex text-xs text-neutral-600 flex-wrap items-center">
           <Link href="/" className="hover:text-neutral-900 transition-colors">
-            Nyumbani
+            Home
           </Link>
           <span className="mx-2">/</span>
           <Link
-            href={handbag.condition === 'new' ? '/new-handbags' : '/second-hand'}
+            href={handbag.condition === 'new' ? '/new' : '/second-hand'}
             className="hover:text-neutral-900 transition-colors"
           >
-            {handbag.condition === 'new' ? 'Pochi Mpya' : 'Pochi za Mtumba'}
+            {handbag.condition === 'new' ? 'New Handbags' : 'Second-Hand'}
           </Link>
           <span className="mx-2">/</span>
           <span className="text-neutral-900 truncate max-w-[200px] md:max-w-none">
@@ -62,7 +63,7 @@ export default async function ProductPage({ params }: PageProps) {
         </nav>
       </div>
 
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">
           {/* Product Gallery */}
           <div>
@@ -78,7 +79,7 @@ export default async function ProductPage({ params }: PageProps) {
               </p>
               {handbag.condition === 'second-hand' && (
                 <span className="bg-neutral-900 text-white px-3 py-1 text-xs font-bold">
-                  MTUMBA
+                  Second-Hand
                 </span>
               )}
             </div>
@@ -100,7 +101,7 @@ export default async function ProductPage({ params }: PageProps) {
             {/* Stock Status */}
             {handbag.stock_status === 'out_of_stock' && (
               <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 text-sm">
-                <p className="font-medium">Pochi hii haipatikani kwa sasa</p>
+                <p className="font-medium">This handbag is currently unavailable</p>
               </div>
             )}
 
@@ -114,25 +115,25 @@ export default async function ProductPage({ params }: PageProps) {
             {/* Product Details */}
             <div className="border-t border-neutral-200 pt-6 space-y-3">
               <h3 className="font-bold text-neutral-900 text-sm uppercase tracking-wide">
-                Maelezo ya Kina
+                Product Details
               </h3>
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between py-2 border-b border-neutral-100">
-                  <dt className="text-neutral-600">Chapa</dt>
+                  <dt className="text-neutral-600">Brand</dt>
                   <dd className="font-medium text-neutral-900">{handbag.brand}</dd>
                 </div>
                 <div className="flex justify-between py-2 border-b border-neutral-100">
-                  <dt className="text-neutral-600">Rangi</dt>
+                  <dt className="text-neutral-600">Color</dt>
                   <dd className="font-medium text-neutral-900">{handbag.color}</dd>
                 </div>
                 <div className="flex justify-between py-2 border-b border-neutral-100">
-                  <dt className="text-neutral-600">Vifaa</dt>
+                  <dt className="text-neutral-600">Material</dt>
                   <dd className="font-medium text-neutral-900">{handbag.material}</dd>
                 </div>
                 <div className="flex justify-between py-2 border-b border-neutral-100">
-                  <dt className="text-neutral-600">Hali</dt>
+                  <dt className="text-neutral-600">Condition</dt>
                   <dd className="font-medium text-neutral-900">
-                    {handbag.condition === 'new' ? 'Mpya' : 'Mtumba'}
+                    {handbag.condition === 'new' ? 'New' : 'Second-Hand'}
                   </dd>
                 </div>
               </dl>
@@ -142,13 +143,13 @@ export default async function ProductPage({ params }: PageProps) {
             {handbag.stock_status === 'in_stock' && (
               <div className="border-t border-neutral-200 pt-6">
                 <WhatsAppButton
-                  phoneNumber={handbag.whatsapp_number}
+                  phoneNumber={whatsappNumber}
                   productName={handbag.name}
                   productPrice={handbag.price}
                   productUrl={productUrl}
                 />
-                <p className="text-xs text-neutral-600 text-center mt-3">
-                  Bonyeza hapa kuwasiliana nasi kupitia WhatsApp
+                <p className="text-xs italic text-center mt-3">
+                  ( Bofya hapo juu kuwasiliana nasi kwa WhatsApp )
                 </p>
               </div>
             )}
@@ -159,7 +160,7 @@ export default async function ProductPage({ params }: PageProps) {
         {similarHandbags && similarHandbags.length > 0 && (
           <div className="mt-16 border-t border-neutral-200 pt-12">
             <h2 className="text-2xl font-bold text-neutral-900 mb-8">
-              Pochi Zinazofanana
+              Similar Handbags
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-10">
               {similarHandbags.map((item) => (

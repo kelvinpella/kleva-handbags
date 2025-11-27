@@ -9,7 +9,7 @@ export default function ProductGrid({ handbags }: ProductGridProps) {
   if (handbags.length === 0) {
     return (
       <div className="text-center py-20">
-        <p className="text-neutral-600 text-lg">Hakuna pochi zinazopatikana kwa sasa</p>
+        <p className="text-neutral-600 text-lg">No handbags are available right now</p>
       </div>
     );
   }
