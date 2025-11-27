@@ -14,7 +14,7 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
   return (
     <div className="space-y-4">
       {/* Main Image */}
-      <div className="relative aspect-[3/4] bg-gray-100 rounded-sm overflow-hidden">
+      <div className="relative aspect-3/4 bg-neutral-100 overflow-hidden">
         <Image
           src={images[selectedImage]}
           alt={`${productName} - Image ${selectedImage + 1}`}
@@ -27,15 +27,15 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
 
       {/* Thumbnail Images */}
       {images.length > 1 && (
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-4 gap-2">
           {images.map((image, index) => (
             <button
               key={index}
               onClick={() => setSelectedImage(index)}
-              className={`relative aspect-square bg-gray-100 rounded-sm overflow-hidden border-2 transition-all ${
+              className={`relative aspect-square bg-neutral-100 overflow-hidden border-2 transition-all ${
                 selectedImage === index
-                  ? 'border-orange-600 ring-2 ring-orange-600 ring-offset-2'
-                  : 'border-transparent hover:border-gray-300'
+                  ? 'border-neutral-900'
+                  : 'border-transparent hover:border-neutral-300'
               }`}
             >
               <Image

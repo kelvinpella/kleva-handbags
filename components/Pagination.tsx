@@ -1,6 +1,4 @@
-'use client';
-
-import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 interface PaginationProps {
   currentPage: number;
@@ -9,19 +7,10 @@ interface PaginationProps {
 }
 
 export default function Pagination({ currentPage, totalPages, basePath }: PaginationProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('page', page.toString());
-    router.push(`${basePath}?${params.toString()}`);
-  };
-
   if (totalPages <= 1) return null;
 
   const getPageNumbers = () => {
-    const pages = [];
+    const pages: (number | string)[] = [];
     const showEllipsis = totalPages > 7;
 
     if (!showEllipsis) {
@@ -50,54 +39,80 @@ export default function Pagination({ currentPage, totalPages, basePath }: Pagina
   };
 
   return (
-    <div className="flex justify-center items-center space-x-2 mt-12 mb-8">
-      <button
-        onClick={() => handlePageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        className="px-4 py-2 border border-gray-300 rounded-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-      >
-        Previous
-      </button>
+    <div className="flex justify-center items-center space-x-1 mt-12 mb-8">
+      {/* Previous Button */}
+      {currentPage > 1 ? (
+        <Link
+          href={`${basePath}?page=${currentPage - 1}`}
+          scroll={true}
+          className="px-4 py-2 border border-neutral-300 text-sm font-medium text-neutral-900 bg-white hover:bg-neutral-50 transition-colors min-w-[90px]"
+        >
+          Previous
+        </Link>
+      ) : (
+        <button
+          disabled
+          className="px-4 py-2 border border-neutral-300 text-sm font-medium text-neutral-900 bg-white opacity-30 cursor-not-allowed min-w-[90px]"
+        >
+          Previous
+        </button>
+      )}
 
-      <div className="hidden md:flex space-x-2">
+      {/* Page Numbers - Desktop */}
+      <div className="hidden md:flex space-x-1">
         {getPageNumbers().map((page, index) => {
           if (page === 'ellipsis') {
             return (
-              <span key={`ellipsis-${index}`} className="px-4 py-2 text-gray-500">
+              <span key={`ellipsis-${index}`} className="px-4 py-2 text-neutral-500">
                 ...
               </span>
             );
           }
 
+          const pageNum = page as number;
+          const isActive = currentPage === pageNum;
+
           return (
-            <button
-              key={page}
-              onClick={() => handlePageChange(page as number)}
-              className={`px-4 py-2 border rounded-sm text-sm font-medium transition-colors ${
-                currentPage === page
-                  ? 'bg-orange-600 text-white border-orange-600'
-                  : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+            <Link
+              key={pageNum}
+              href={`${basePath}?page=${pageNum}`}
+              scroll={true}
+              className={`min-w-[44px] px-4 py-2 border text-sm font-medium transition-colors ${
+                isActive
+                  ? 'bg-neutral-900 text-white border-neutral-900'
+                  : 'border-neutral-300 text-neutral-900 bg-white hover:bg-neutral-50'
               }`}
             >
-              {page}
-            </button>
+              {pageNum}
+            </Link>
           );
         })}
       </div>
 
+      {/* Page Info - Mobile */}
       <div className="md:hidden">
-        <span className="px-4 py-2 text-sm text-gray-700">
+        <span className="px-4 py-2 text-sm text-neutral-700">
           Page {currentPage} of {totalPages}
         </span>
       </div>
 
-      <button
-        onClick={() => handlePageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        className="px-4 py-2 border border-gray-300 rounded-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-      >
-        Next
-      </button>
+      {/* Next Button */}
+      {currentPage < totalPages ? (
+        <Link
+          href={`${basePath}?page=${currentPage + 1}`}
+          scroll={true}
+          className="px-4 py-2 border border-neutral-300 text-sm font-medium text-neutral-900 bg-white hover:bg-neutral-50 transition-colors min-w-[90px]"
+        >
+          Next
+        </Link>
+      ) : (
+        <button
+          disabled
+          className="px-4 py-2 border border-neutral-300 text-sm font-medium text-neutral-900 bg-white opacity-30 cursor-not-allowed min-w-[90px]"
+        >
+          Next
+        </button>
+      )}
     </div>
   );
 }

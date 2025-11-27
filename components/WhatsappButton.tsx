@@ -24,7 +24,7 @@ export default function WhatsAppButton({
   return (
     <button
       onClick={handleWhatsAppClick}
-      className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-sm transition-colors duration-200 flex items-center justify-center space-x-3 text-lg"
+      className="w-full bg-[#25D366] hover:bg-[#20BA5A] text-white font-semibold py-4 px-6 transition-colors duration-200 flex items-center justify-center space-x-3 text-base shadow-sm hover:shadow-md"
     >
       <svg
         className="w-6 h-6"
