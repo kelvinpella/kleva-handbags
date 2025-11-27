@@ -7,8 +7,8 @@ import { Handbag } from '@/typings';
 const ITEMS_PER_PAGE = 12;
 
 export const metadata = {
-  title: 'Pochi Mpya - Pochi Store',
-  description: 'Nunua pochi mpya za kisasa kwa bei nafuu',
+  title: 'New Handbags - Kleva Handbags',
+  description: 'Shop modern new handbags at affordable prices',
 };
 
 interface SearchParams {
@@ -28,31 +28,32 @@ export default async function NewHandbagsPage({
   const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
   const endItem = Math.min(currentPage * ITEMS_PER_PAGE, count || 0);
 
+
   return (
     <>
       <ScrollToTop />
       <div className="bg-white min-h-screen">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header Section */}
           <div className="mb-8 pb-6 border-b border-neutral-200">
-            <h1 className="text-3xl font-bold text-neutral-900 mb-2">Pochi Mpya</h1>
-            <p className="text-neutral-600 text-sm">
-              Pata pochi mpya za kisasa zenye ubora wa hali ya juu
+            <h1 className="text-3xl font-bold text-neutral-900 mb-2">New Handbags</h1>
+            <p className="italic">
+              ( Pochi Mpya )
             </p>
-            <div className="mt-4 flex items-center justify-between">
+            <div className="mt-6 flex items-center justify-between">
               <div className="text-sm text-neutral-500">
                 {count && count > 0 ? (
                   <>
-                    Inaonyesha <span className="font-medium text-neutral-900">{startItem}-{endItem}</span> ya{' '}
-                    <span className="font-medium text-neutral-900">{count}</span> bidhaa
+                    Showing <span className="font-medium text-neutral-900">{startItem}-{endItem}</span> of{' '}
+                    <span className="font-medium text-neutral-900">{count}</span> items
                   </>
                 ) : (
-                  'Hakuna bidhaa'
+                  'No items available'
                 )}
               </div>
               {totalPages > 1 && (
                 <div className="text-sm text-neutral-500">
-                  Ukurasa <span className="font-medium text-neutral-900">{currentPage}</span> wa{' '}
+                  Page <span className="font-medium text-neutral-900">{currentPage}</span> of{' '}
                   <span className="font-medium text-neutral-900">{totalPages}</span>
                 </div>
               )}
@@ -65,7 +66,7 @@ export default async function NewHandbagsPage({
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
-              basePath="/new-handbags"
+              basePath="/new"
             />
           )}
         </div>
