@@ -29,6 +29,8 @@ export async function getHandbags(
 }
 
 export async function getHandbagById(id: string) {
+  console.log('Fetching handbag with ID:', id);
+  
   const { data, error } = await supabase
     .from('handbags')
     .select('*')
@@ -40,6 +42,7 @@ export async function getHandbagById(id: string) {
     return null;
   }
 
+  console.log('Fetched handbag:', data);
   return data;
 }
 

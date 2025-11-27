@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-export default function NotFound() {
+export default function ProductNotFound() {
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4 bg-white">
       <div className="text-center max-w-md">
@@ -15,29 +15,29 @@ export default function NotFound() {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={1.5}
-              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
             />
           </svg>
         </div>
         <h1 className="text-6xl font-bold text-neutral-900 mb-4">404</h1>
         <h2 className="text-2xl font-semibold text-neutral-700 mb-4">
-          Ukurasa haujapatikana
+          Pochi haipo
         </h2>
         <p className="text-neutral-600 mb-8">
-          Samahani, ukurasa unaoutafuta haupo. Huenda pochi hii imeuzwa au link si sahihi.
+          Samahani, pochi unayoitafuta haipo. Huenda imeuzwa tayari au link si sahihi.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/"
+            href="/new-handbags"
             className="inline-block bg-neutral-900 text-white px-6 py-3 font-medium hover:bg-neutral-800 transition-colors"
           >
-            Rudi Nyumbani
+            Angalia Pochi Mpya
           </Link>
           <Link
-            href="/new-handbags"
+            href="/second-hand"
             className="inline-block border border-neutral-300 text-neutral-900 px-6 py-3 font-medium hover:bg-neutral-50 transition-colors"
           >
-            Angalia Pochi Mpya
+            Angalia Pochi za Mtumba
           </Link>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { getHandbags } from '@/lib/supabase';
 import ProductGrid from '@/components/ProductGrid';
 import Pagination from '@/components/Pagination';
+import ScrollToTop from '@/components/ScrollToTop';
 import { Handbag } from '@/typings';
 
 const ITEMS_PER_PAGE = 12;
@@ -10,36 +11,65 @@ export const metadata = {
   description: 'Nunua pochi mpya za kisasa kwa bei nafuu',
 };
 
+interface SearchParams {
+  page?: string;
+}
+
 export default async function NewHandbagsPage({
   searchParams,
 }: {
-  searchParams: { page?: string };
+  searchParams: SearchParams;
 }) {
-  const currentPage = Number(searchParams.page) || 1;
+  const params = await Promise.resolve(searchParams);
+  const currentPage = Number(params.page) || 1;
+  
   const { data, count } = await getHandbags('new', currentPage, ITEMS_PER_PAGE);
   const totalPages = Math.ceil((count || 0) / ITEMS_PER_PAGE);
+  const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+  const endItem = Math.min(currentPage * ITEMS_PER_PAGE, count || 0);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Pochi Mpya</h1>
-        <p className="text-gray-600">
-          Pata pochi mpya za kisasa zenye ubora wa hali ya juu
-        </p>
-        <div className="mt-4 text-sm text-gray-500">
-          Inaonyesha {data?.length || 0} ya pochi {count || 0}
+    <>
+      <ScrollToTop />
+      <div className="bg-white min-h-screen">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Header Section */}
+          <div className="mb-8 pb-6 border-b border-neutral-200">
+            <h1 className="text-3xl font-bold text-neutral-900 mb-2">Pochi Mpya</h1>
+            <p className="text-neutral-600 text-sm">
+              Pata pochi mpya za kisasa zenye ubora wa hali ya juu
+            </p>
+            <div className="mt-4 flex items-center justify-between">
+              <div className="text-sm text-neutral-500">
+                {count && count > 0 ? (
+                  <>
+                    Inaonyesha <span className="font-medium text-neutral-900">{startItem}-{endItem}</span> ya{' '}
+                    <span className="font-medium text-neutral-900">{count}</span> bidhaa
+                  </>
+                ) : (
+                  'Hakuna bidhaa'
+                )}
+              </div>
+              {totalPages > 1 && (
+                <div className="text-sm text-neutral-500">
+                  Ukurasa <span className="font-medium text-neutral-900">{currentPage}</span> wa{' '}
+                  <span className="font-medium text-neutral-900">{totalPages}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <ProductGrid handbags={(data as Handbag[]) || []} />
+
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              basePath="/new-handbags"
+            />
+          )}
         </div>
       </div>
-
-      <ProductGrid handbags={(data as Handbag[]) || []} />
-
-      {totalPages > 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          basePath="/new-handbags"
-        />
-      )}
-    </div>
+    </>
   );
 }
