@@ -21,23 +21,23 @@ export default function NotFound() {
         </div>
         <h1 className="text-6xl font-bold text-neutral-900 mb-4">404</h1>
         <h2 className="text-2xl font-semibold text-neutral-700 mb-4">
-          Ukurasa haujapatikana
+          Page Not Found
         </h2>
         <p className="text-neutral-600 mb-8">
-          Samahani, ukurasa unaoutafuta haupo. Huenda pochi hii imeuzwa au link si sahihi.
+          Sorry, the page you're looking for doesn't exist. The link might be incorrect.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/"
             className="inline-block bg-neutral-900 text-white px-6 py-3 font-medium hover:bg-neutral-800 transition-colors"
           >
-            Rudi Nyumbani
+            Go Home
           </Link>
           <Link
-            href="/new-handbags"
+            href="/new"
             className="inline-block border border-neutral-300 text-neutral-900 px-6 py-3 font-medium hover:bg-neutral-50 transition-colors"
           >
-            Angalia Pochi Mpya
+            View New Handbags
           </Link>
         </div>
       </div>

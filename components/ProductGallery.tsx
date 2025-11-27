@@ -36,7 +36,7 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
             }}
             className="absolute top-3 right-3 w-10 h-10 bg-white hover:bg-neutral-100 rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all"
             aria-label="View in fullscreen"
-            title="Tazama picha kwa ukubwa"
+            title="View in fullscreen"
           >
             <svg
               className="w-5 h-5 text-neutral-900"
