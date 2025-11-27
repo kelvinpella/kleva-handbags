@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kleva Handbags
 
-## Getting Started
+Internal catalog for a local business that tracks brand-new (`Mpya`) and second-hand (`Mtumba`) handbags. The project runs on the Next.js App Router stack and is deployed to https://kleva-handbags.vercel.app/ for easy access by the team.
 
-First, run the development server:
+## Features
+- Structured database of handbag metadata (condition, imagery, pricing).
+- Quick filters for new vs. second-hand inventory views.
+- Social links to TikTok and Instagram for cross-checking marketing content.
+
+## Tech Stack
+- Next.js 15 / React 18
+- TypeScript & Tailwind CSS
+- Vercel hosting and deployment
+
+## Local Development
+Install dependencies and start the dev server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# or: yarn dev / pnpm dev / bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit http://localhost:3000 to preview changes. Edit `app/page.tsx` (and related components) to adjust catalog views; the page hot-reloads as you edit.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
+The project is automatically deployed to Vercel on every push to `main`. Manual deployments can be triggered via:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+vercel deploy --prod
+```
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Contributing
+1. Fork and clone the repo.
+2. Create a feature branch: `git checkout -b feature/my-change`.
+3. Run tests/lints (if available), open a PR, and describe your change clearly.
