@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "upload-images": "node scripts/upload-images.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.86.0",
