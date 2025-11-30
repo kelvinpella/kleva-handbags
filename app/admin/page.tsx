@@ -1,12 +1,10 @@
 'use client';
 
-import { useAuth } from '@/lib/auth-context';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
 export default function AdminDashboard() {
-  const { user } = useAuth();
   const [stats, setStats] = useState({
     totalProducts: 0,
     newProducts: 0,
@@ -45,7 +43,7 @@ export default function AdminDashboard() {
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-neutral-900">Dashboard</h1>
-        <p className="text-neutral-600 mt-2">Welcome back, {user?.email}</p>
+        <p className="text-neutral-600 mt-2">Welcome to your admin dashboard</p>
       </div>
 
       {/* Stats Grid */}

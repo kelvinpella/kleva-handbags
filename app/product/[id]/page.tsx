@@ -3,8 +3,9 @@ import ProductGallery from '@/components/ProductGallery';
 import WhatsAppButton from '@/components/WhatsappButton';
 import ProductCard from '@/components/ProductCard';
 import { notFound } from 'next/navigation';
-    import { Handbag } from '@/typings';
+import { Handbag } from '@/typings';
 import Link from 'next/link';
+import { CONDITION_LABELS } from '@/lib/constants';
 
 interface PageProps {
   params: {
@@ -133,7 +134,7 @@ export default async function ProductPage({ params }: PageProps) {
                 <div className="flex justify-between py-2 border-b border-neutral-100">
                   <dt className="text-neutral-600">Condition</dt>
                   <dd className="font-medium text-neutral-900">
-                    {handbag.condition === 'new' ? 'New' : 'Second-Hand'}
+                    {CONDITION_LABELS[handbag.condition]}
                   </dd>
                 </div>
               </dl>

@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Handbag } from '@/typings';
+import { PRODUCT_CONDITIONS, CONDITION_LABELS } from '@/lib/constants';
 
 export default function ProductsListPage() {
   const [products, setProducts] = useState<Handbag[]>([]);
@@ -121,9 +122,9 @@ export default function ProductsListPage() {
               All
             </button>
             <button
-              onClick={() => setFilter('new')}
+              onClick={() => setFilter(PRODUCT_CONDITIONS.NEW)}
               className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                filter === 'new'
+                filter === PRODUCT_CONDITIONS.NEW
                   ? 'bg-neutral-900 text-white'
                   : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
               }`}
@@ -131,9 +132,9 @@ export default function ProductsListPage() {
               New
             </button>
             <button
-              onClick={() => setFilter('second-hand')}
+              onClick={() => setFilter(PRODUCT_CONDITIONS.SECOND_HAND)}
               className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                filter === 'second-hand'
+                filter === PRODUCT_CONDITIONS.SECOND_HAND
                   ? 'bg-neutral-900 text-white'
                   : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
               }`}
@@ -232,12 +233,12 @@ export default function ProductsListPage() {
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
-                          product.condition === 'new'
+                          product.condition === PRODUCT_CONDITIONS.NEW
                             ? 'bg-green-100 text-green-800'
                             : 'bg-orange-100 text-orange-800'
                         }`}
                       >
-                        {product.condition === 'new' ? 'New' : 'Second Hand'}
+                        {CONDITION_LABELS[product.condition]}
                       </span>
                     </td>
                     <td className="px-6 py-4">

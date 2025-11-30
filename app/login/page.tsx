@@ -1,53 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import { useAuth } from "@/lib/auth-context";
-import { useRouter } from "next/navigation";
+import { signInWithGoogle } from "@/lib/auth-context";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-
-  const { signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
-  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError("");
       await signInWithGoogle();
     } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleEmailAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setMessage("");
-    setLoading(true);
-
-    try {
-      if (isSignUp) {
-        const { error } = await signUpWithEmail(email, password);
-        if (error) throw error;
-        setMessage("Check your email for the confirmation link!");
-      } else {
-        const { error } = await signInWithEmail(email, password);
-        if (error) throw error;
-        router.push("/admin");
-      }
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      console.error("Google sign-in error:", err);
+      setError(err.message || "Failed to sign in with Google");
+      setIsLoading(false);
     }
   };
 
@@ -61,21 +30,23 @@ export default function LoginPage() {
             </span>
           </Link>
           <h2 className="text-2xl font-bold text-neutral-900">
-            {isSignUp ? "Create Account" : "Admin Sign In"}
+            Admin Sign In
           </h2>
           <p className="mt-2 text-sm text-neutral-600">
-            {isSignUp
-              ? "Sign up to manage your handbag store"
-              : "Access your admin dashboard"}
+            Sign in with Google to access your admin dashboard
           </p>
         </div>
 
         <div className="bg-white py-8 px-6 shadow-sm border border-neutral-200 rounded-lg">
-          {/* Google Sign In */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-600">
+              {error}
+            </div>
+          )}
           <button
             onClick={handleGoogleSignIn}
-            disabled={loading}
-            className="w-full flex items-center justify-center space-x-3 px-4 py-3 border border-neutral-300 rounded-md hover:bg-neutral-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isLoading}
+            className="w-full flex items-center justify-center space-x-3 px-4 py-3 border border-neutral-300 rounded-md hover:bg-neutral-50 transition-colors focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -96,95 +67,9 @@ export default function LoginPage() {
               />
             </svg>
             <span className="text-sm font-medium text-neutral-700">
-              Continue with Google
+              {isLoading ? "Signing in..." : "Sign in with Google"}
             </span>
           </button>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-neutral-300"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-neutral-500">
-                Or continue with email
-              </span>
-            </div>
-          </div>
-
-          {/* Email Form */}
-          <form onSubmit={handleEmailAuth} className="space-y-4">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-neutral-700 mb-1"
-              >
-                Email address
-              </label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-                placeholder="you@example.com"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-neutral-700 mb-1"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-                placeholder="••••••••"
-                minLength={6}
-              />
-            </div>
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded text-sm">
-                {error}
-              </div>
-            )}
-
-            {message && (
-              <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded text-sm">
-                {message}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-neutral-900 text-white py-3 rounded-md hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-            >
-              {loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => {
-                setIsSignUp(!isSignUp);
-                setError("");
-                setMessage("");
-              }}
-              className="text-sm text-neutral-600 hover:text-neutral-900"
-            >
-              {isSignUp
-                ? "Already have an account? Sign in"
-                : "Don't have an account? Sign up"}
-            </button>
-          </div>
         </div>
 
         <div className="text-center">

@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { uploadMultipleImages, deleteImage, getPathFromUrl } from '@/lib/supabase-storage';
-import Image from 'next/image';
+import { uploadMultipleImages, getPathFromUrl } from '@/lib/supabase-storage';
+import ProductForm, { ProductFormData } from '@/components/Admin/ProductForm';
 import { Handbag } from '@/typings';
+import { IMAGE_UPLOAD_CONFIG } from '@/lib/constants';
 
 interface PageProps {
   params: {
@@ -21,16 +22,16 @@ export default function EditProductPage({ params }: PageProps) {
   const [error, setError] = useState('');
   const [product, setProduct] = useState<Handbag | null>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ProductFormData>({
     name: '',
     description: '',
     price: '',
-    condition: 'new' as 'new' | 'second-hand',
+    condition: 'new',
     brand: '',
     color: '',
     material: '',
     whatsapp_number: '',
-    stock_status: 'in_stock' as 'in_stock' | 'out_of_stock',
+    stock_status: 'in_stock',
   });
 
   const [existingImages, setExistingImages] = useState<string[]>([]);
@@ -86,8 +87,8 @@ export default function EditProductPage({ params }: PageProps) {
     const fileArray = Array.from(files);
     const totalImages = existingImages.length + newImageFiles.length + fileArray.length;
 
-    if (totalImages > 5) {
-      setError('Maximum 5 images allowed');
+    if (totalImages > IMAGE_UPLOAD_CONFIG.MAX_IMAGES) {
+      setError(`Maximum ${IMAGE_UPLOAD_CONFIG.MAX_IMAGES} images allowed`);
       return;
     }
 
@@ -184,274 +185,23 @@ export default function EditProductPage({ params }: PageProps) {
         <p className="text-neutral-600 mt-2">Update product information</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white border border-neutral-200 rounded-lg p-6 space-y-6">
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md text-sm">
-            {error}
-          </div>
-        )}
-
-        {/* Existing Images */}
-        {existingImages.length > 0 && (
-          <div>
-            <label className="block text-sm font-medium text-neutral-900 mb-2">
-              Current Images
-            </label>
-            <div className="grid grid-cols-5 gap-4">
-              {existingImages.map((image, index) => (
-                <div
-                  key={index}
-                  className="relative aspect-square bg-neutral-100 rounded-lg overflow-hidden group"
-                >
-                  <Image src={image} alt={`Current ${index + 1}`} fill className="object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => removeExistingImage(index)}
-                    className="absolute top-2 right-2 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <svg
-                      className="w-4 h-4 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Add New Images */}
-        <div>
-          <label className="block text-sm font-medium text-neutral-900 mb-2">
-            Add New Images (Optional)
-          </label>
-          <div className="border-2 border-dashed border-neutral-300 rounded-lg p-6">
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleNewImageChange}
-              disabled={uploadingImages}
-              className="block w-full text-sm text-neutral-600
-                file:mr-4 file:py-2 file:px-4
-                file:rounded file:border-0
-                file:text-sm file:font-semibold
-                file:bg-neutral-900 file:text-white
-                hover:file:bg-neutral-800
-                file:cursor-pointer cursor-pointer"
-            />
-            <p className="mt-2 text-xs text-neutral-500">
-              Maximum {5 - existingImages.length} more images
-            </p>
-          </div>
-
-          {/* New Image Previews */}
-          {newImagePreviews.length > 0 && (
-            <div className="mt-4 grid grid-cols-5 gap-4">
-              {newImagePreviews.map((preview, index) => (
-                <div
-                  key={index}
-                  className="relative aspect-square bg-neutral-100 rounded-lg overflow-hidden group"
-                >
-                  <Image src={preview} alt={`New ${index + 1}`} fill className="object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => removeNewImage(index)}
-                    className="absolute top-2 right-2 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <svg
-                      className="w-4 h-4 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Product Name */}
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-neutral-900 mb-2">
-            Product Name <span className="text-red-600">*</span>
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            required
-            value={formData.name}
-            onChange={handleInputChange}
-            className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-          />
-        </div>
-
-        {/* Description */}
-        <div>
-          <label htmlFor="description" className="block text-sm font-medium text-neutral-900 mb-2">
-            Description <span className="text-red-600">*</span>
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            required
-            value={formData.description}
-            onChange={handleInputChange}
-            rows={4}
-            className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-          />
-        </div>
-
-        {/* Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="price" className="block text-sm font-medium text-neutral-900 mb-2">
-              Price (TSh) <span className="text-red-600">*</span>
-            </label>
-            <input
-              type="number"
-              id="price"
-              name="price"
-              required
-              step="0.01"
-              min="0"
-              value={formData.price}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="condition" className="block text-sm font-medium text-neutral-900 mb-2">
-              Condition <span className="text-red-600">*</span>
-            </label>
-            <select
-              id="condition"
-              name="condition"
-              required
-              value={formData.condition}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-            >
-              <option value="new">New</option>
-              <option value="second-hand">Second Hand</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="brand" className="block text-sm font-medium text-neutral-900 mb-2">
-              Brand <span className="text-red-600">*</span>
-            </label>
-            <input
-              type="text"
-              id="brand"
-              name="brand"
-              required
-              value={formData.brand}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="color" className="block text-sm font-medium text-neutral-900 mb-2">
-              Color <span className="text-red-600">*</span>
-            </label>
-            <input
-              type="text"
-              id="color"
-              name="color"
-              required
-              value={formData.color}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="material" className="block text-sm font-medium text-neutral-900 mb-2">
-              Material <span className="text-red-600">*</span>
-            </label>
-            <input
-              type="text"
-              id="material"
-              name="material"
-              required
-              value={formData.material}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="stock_status" className="block text-sm font-medium text-neutral-900 mb-2">
-              Stock Status
-            </label>
-            <select
-              id="stock_status"
-              name="stock_status"
-              value={formData.stock_status}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-            >
-              <option value="in_stock">In Stock</option>
-              <option value="out_of_stock">Out of Stock</option>
-            </select>
-          </div>
-        </div>
-
-        {/* WhatsApp Number */}
-        <div>
-          <label htmlFor="whatsapp_number" className="block text-sm font-medium text-neutral-900 mb-2">
-            WhatsApp Number <span className="text-red-600">*</span>
-          </label>
-          <input
-            type="tel"
-            id="whatsapp_number"
-            name="whatsapp_number"
-            required
-            value={formData.whatsapp_number}
-            onChange={handleInputChange}
-            className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-          />
-        </div>
-
-        {/* Submit Buttons */}
-        <div className="flex items-center space-x-4 pt-6 border-t border-neutral-200">
-          <button
-            type="submit"
-            disabled={saving || uploadingImages}
-            className="px-6 py-3 bg-neutral-900 text-white rounded-md hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-          >
-            {uploadingImages ? 'Uploading...' : saving ? 'Saving...' : 'Save Changes'}
-          </button>
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="px-6 py-3 border border-neutral-300 text-neutral-700 rounded-md hover:bg-neutral-50 transition-colors font-medium"
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
+      <ProductForm
+        initialData={formData}
+        existingImages={existingImages}
+        newImagePreviews={newImagePreviews}
+        uploadingImages={uploadingImages}
+        loading={loading}
+        error={error}
+        onSubmit={handleSubmit}
+        onInputChange={handleInputChange}
+        onImageChange={handleNewImageChange}
+        onRemoveExistingImage={removeExistingImage}
+        onRemoveNewImage={removeNewImage}
+        submitButtonText="Save Changes"
+        submitting={saving}
+        isEditing={true}
+        onCancel={() => router.back()}
+      />
     </div>
   );
 }
