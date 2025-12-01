@@ -9,10 +9,13 @@ export interface ProductFormData {
   price: string;
   condition: 'new' | 'second-hand';
   brand: string;
-  color: string;
   material: string;
-  whatsapp_number: string;
   stock_status: 'in_stock' | 'out_of_stock';
+  dimensions?: string;
+  number_of_colors_available?: string;
+  buying_price?: string;
+  selling_price?: string;
+  items_sold?: string;
 }
 
 interface ProductFormProps {
@@ -177,41 +180,39 @@ export default function ProductForm({
         />
       </div>
 
-      {/* Description */}
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium text-neutral-900 mb-2">
-          Description <span className="text-red-600">*</span>
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          required
-          value={initialData?.description || ''}
-          onChange={onInputChange}
-          rows={4}
-          className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-          placeholder="Detailed product description..."
-        />
-      </div>
-
       {/* Grid Layout for Multiple Fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Price */}
+        {/* Brand */}
         <div>
-          <label htmlFor="price" className="block text-sm font-medium text-neutral-900 mb-2">
-            Price (TSh) <span className="text-red-600">*</span>
+          <label htmlFor="brand" className="block text-sm font-medium text-neutral-900 mb-2">
+            Brand <span className="text-red-600">*</span>
           </label>
           <input
-            type="number"
-            id="price"
-            name="price"
+            type="text"
+            id="brand"
+            name="brand"
             required
-            step="0.01"
-            min="0"
-            value={initialData?.price || ''}
+            value={initialData?.brand || ''}
             onChange={onInputChange}
             className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-            placeholder="e.g., 89999.00"
+            placeholder="e.g., LuxeBrand"
+          />
+        </div>
+
+        {/* Material */}
+        <div>
+          <label htmlFor="material" className="block text-sm font-medium text-neutral-900 mb-2">
+            Material <span className="text-red-600">*</span>
+          </label>
+          <input
+            type="text"
+            id="material"
+            name="material"
+            required
+            value={initialData?.material || ''}
+            onChange={onInputChange}
+            className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
+            placeholder="e.g., Genuine Leather"
           />
         </div>
 
@@ -233,54 +234,93 @@ export default function ProductForm({
           </select>
         </div>
 
-        {/* Brand */}
+        {/* Dimensions */}
         <div>
-          <label htmlFor="brand" className="block text-sm font-medium text-neutral-900 mb-2">
-            Brand <span className="text-red-600">*</span>
+          <label htmlFor="dimensions" className="block text-sm font-medium text-neutral-900 mb-2">
+            Dimensions
           </label>
           <input
             type="text"
-            id="brand"
-            name="brand"
-            required
-            value={initialData?.brand || ''}
+            id="dimensions"
+            name="dimensions"
+            value={initialData?.dimensions || ''}
             onChange={onInputChange}
             className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-            placeholder="e.g., LuxeBrand"
+            placeholder="e.g., 30cm x 20cm x 10cm"
+          />
+        </div>
+      </div>
+
+      {/* Description */}
+      <div>
+        <label htmlFor="description" className="block text-sm font-medium text-neutral-900 mb-2">
+          Description <span className="text-red-600">*</span>
+        </label>
+        <textarea
+          id="description"
+          name="description"
+          required
+          value={initialData?.description || ''}
+          onChange={onInputChange}
+          rows={4}
+          className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
+          placeholder="Detailed product description..."
+        />
+      </div>
+
+      {/* Pricing and Inventory */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Selling Price */}
+        <div>
+          <label htmlFor="selling_price" className="block text-sm font-medium text-neutral-900 mb-2">
+            Selling Price (TSh) <span className="text-red-600">*</span>
+          </label>
+          <input
+            type="number"
+            id="selling_price"
+            name="selling_price"
+            required
+            step="0.01"
+            min="0"
+            value={initialData?.selling_price || initialData?.price || ''}
+            onChange={onInputChange}
+            className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
+            placeholder="e.g., 89999.00"
           />
         </div>
 
-        {/* Color */}
+        {/* Buying Price */}
         <div>
-          <label htmlFor="color" className="block text-sm font-medium text-neutral-900 mb-2">
-            Color <span className="text-red-600">*</span>
+          <label htmlFor="buying_price" className="block text-sm font-medium text-neutral-900 mb-2">
+            Buying Price (TSh)
           </label>
           <input
-            type="text"
-            id="color"
-            name="color"
-            required
-            value={initialData?.color || ''}
+            type="number"
+            id="buying_price"
+            name="buying_price"
+            step="0.01"
+            min="0"
+            value={initialData?.buying_price || ''}
             onChange={onInputChange}
             className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-            placeholder="e.g., Black"
+            placeholder="e.g., 50000.00"
           />
         </div>
 
-        {/* Material */}
+        {/* Number of Colors Available */}
         <div>
-          <label htmlFor="material" className="block text-sm font-medium text-neutral-900 mb-2">
-            Material <span className="text-red-600">*</span>
+          <label htmlFor="number_of_colors_available" className="block text-sm font-medium text-neutral-900 mb-2">
+            Number of Colors Available
           </label>
           <input
-            type="text"
-            id="material"
-            name="material"
-            required
-            value={initialData?.material || ''}
+            type="number"
+            id="number_of_colors_available"
+            name="number_of_colors_available"
+            min="1"
+            value={initialData?.number_of_colors_available || ''}
             onChange={onInputChange}
             className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-            placeholder="e.g., Genuine Leather"
+            placeholder="e.g., 3"
           />
         </div>
 
@@ -300,26 +340,23 @@ export default function ProductForm({
             <option value="out_of_stock">Out of Stock</option>
           </select>
         </div>
-      </div>
 
-      {/* WhatsApp Number */}
-      <div>
-        <label htmlFor="whatsapp_number" className="block text-sm font-medium text-neutral-900 mb-2">
-          WhatsApp Number <span className="text-red-600">*</span>
-        </label>
-        <input
-          type="tel"
-          id="whatsapp_number"
-          name="whatsapp_number"
-          required
-          value={initialData?.whatsapp_number || ''}
-          onChange={onInputChange}
-          className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-          placeholder="+255712345678"
-        />
-        <p className="mt-1 text-xs text-neutral-500">
-          Include country code (e.g., +255 for Tanzania)
-        </p>
+        {/* Items Sold */}
+        <div>
+          <label htmlFor="items_sold" className="block text-sm font-medium text-neutral-900 mb-2">
+            Items Sold
+          </label>
+          <input
+            type="number"
+            id="items_sold"
+            name="items_sold"
+            min="0"
+            value={initialData?.items_sold || ''}
+            onChange={onInputChange}
+            className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
+            placeholder="e.g., 5"
+          />
+        </div>
       </div>
 
       {/* Submit Buttons */}

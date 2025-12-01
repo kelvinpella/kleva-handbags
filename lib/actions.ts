@@ -143,20 +143,28 @@ export async function getPublicUrl(path: string): Promise<string> {
 export async function createProduct(productData: {
   name: string;
   description: string;
-  price: number;
+  price?: number;
   condition: string;
   brand: string;
-  color: string;
   material: string;
   images: string[];
-  whatsapp_number: string;
+  whatsapp_number?: string;
   stock_status: string;
+  dimensions?: string;
+  number_of_colors_available?: number;
+  buying_price?: number;
+  selling_price?: number;
+  items_sold?: number;
 }): Promise<{ success: boolean; error?: string; id?: string }> {
   try {
     const supabase = await createClient();
+
+    // Prepare data for insertion - remove 'price' and 'whatsapp_number' fields
+    const { price, whatsapp_number, ...restData } = productData;
+
     const { data, error: insertError } = await supabase
       .from("handbags")
-      .insert([productData])
+      .insert([restData])
       .select();
 
     if (insertError) {

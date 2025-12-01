@@ -276,7 +276,7 @@ export default function ProductsListPage() {
                             {product.name}
                           </p>
                           <p className="text-sm text-neutral-600 truncate">
-                            {product.color}
+                            {product.material}
                           </p>
                         </div>
                       </div>

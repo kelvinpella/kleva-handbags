@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { uploadMultipleImages, createProduct } from "@/lib/actions";
 import ProductForm, { ProductFormData } from "@/components/Admin/ProductForm";
-import { IMAGE_UPLOAD_CONFIG, DEFAULT_WHATSAPP_PREFIX } from "@/lib/constants";
+import { IMAGE_UPLOAD_CONFIG } from "@/lib/constants";
 
 export default function AddProductPage() {
   const router = useRouter();
@@ -18,10 +18,13 @@ export default function AddProductPage() {
     price: "",
     condition: "new",
     brand: "",
-    color: "",
     material: "",
-    whatsapp_number: DEFAULT_WHATSAPP_PREFIX,
     stock_status: "in_stock",
+    dimensions: "",
+    number_of_colors_available: "1",
+    buying_price: "",
+    selling_price: "",
+    items_sold: "0",
   });
 
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -70,7 +73,7 @@ export default function AddProductPage() {
         throw new Error("Please upload at least one image");
       }
 
-      if (!formData.name || !formData.description || !formData.price) {
+      if (!formData.name || !formData.description || !formData.selling_price) {
         throw new Error("Please fill in all required fields");
       }
 
@@ -87,14 +90,16 @@ export default function AddProductPage() {
       const result = await createProduct({
         name: formData.name,
         description: formData.description,
-        price: parseFloat(formData.price),
         condition: formData.condition,
         brand: formData.brand,
-        color: formData.color,
         material: formData.material,
         images: imageUrls,
-        whatsapp_number: formData.whatsapp_number,
         stock_status: formData.stock_status,
+        dimensions: formData.dimensions,
+        number_of_colors_available: formData.number_of_colors_available ? parseInt(formData.number_of_colors_available) : 1,
+        buying_price: formData.buying_price ? parseFloat(formData.buying_price) : undefined,
+        selling_price: parseFloat(formData.selling_price),
+        items_sold: formData.items_sold ? parseInt(formData.items_sold) : 0,
       });
 
       if (!result.success) {

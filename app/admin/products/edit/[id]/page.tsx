@@ -28,10 +28,13 @@ export default function EditProductPage({ params }: PageProps) {
     price: '',
     condition: 'new',
     brand: '',
-    color: '',
     material: '',
-    whatsapp_number: '',
     stock_status: 'in_stock',
+    dimensions: '',
+    number_of_colors_available: '1',
+    buying_price: '',
+    selling_price: '',
+    items_sold: '0',
   });
 
   const [existingImages, setExistingImages] = useState<string[]>([]);
@@ -56,13 +59,16 @@ export default function EditProductPage({ params }: PageProps) {
       setFormData({
         name: data.name,
         description: data.description,
-        price: data.price.toString(),
+        price: data.price?.toString() || data.selling_price?.toString() || '',
         condition: data.condition,
         brand: data.brand,
-        color: data.color,
         material: data.material,
-        whatsapp_number: data.whatsapp_number,
         stock_status: data.stock_status,
+        dimensions: data.dimensions || '',
+        number_of_colors_available: data.number_of_colors_available?.toString() || '1',
+        buying_price: data.buying_price?.toString() || '',
+        selling_price: data.selling_price?.toString() || data.price?.toString() || '',
+        items_sold: data.items_sold?.toString() || '0',
       });
       setExistingImages(data.images || []);
     } catch (err: any) {
@@ -138,14 +144,18 @@ export default function EditProductPage({ params }: PageProps) {
         .update({
           name: formData.name,
           description: formData.description,
-          price: parseFloat(formData.price),
+          price: parseFloat(formData.selling_price || formData.price),
           condition: formData.condition,
           brand: formData.brand,
-          color: formData.color,
           material: formData.material,
           images: allImages,
-          whatsapp_number: formData.whatsapp_number,
+          whatsapp_number: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
           stock_status: formData.stock_status,
+          dimensions: formData.dimensions,
+          number_of_colors_available: formData.number_of_colors_available ? parseInt(formData.number_of_colors_available) : 1,
+          buying_price: formData.buying_price ? parseFloat(formData.buying_price) : null,
+          selling_price: formData.selling_price ? parseFloat(formData.selling_price) : parseFloat(formData.price),
+          items_sold: formData.items_sold ? parseInt(formData.items_sold) : 0,
         })
         .eq('id', params.id);
 
