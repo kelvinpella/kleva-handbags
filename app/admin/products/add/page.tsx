@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { uploadMultipleImages, createProduct, updateProduct, fetchProductById } from "@/lib/actions";
 import ProductForm, { ProductFormData } from "@/components/Admin/ProductForm";
 import { IMAGE_UPLOAD_CONFIG } from "@/lib/constants";
 
-export default function AddProductPage() {
+function AddProductContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get("id");
@@ -221,5 +221,17 @@ export default function AddProductPage() {
         onCancel={() => router.back()}
       />
     </div>
+  );
+}
+
+export default function AddProductPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neutral-900"></div>
+      </div>
+    }>
+      <AddProductContent />
+    </Suspense>
   );
 }

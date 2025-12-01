@@ -1,3 +1,5 @@
+'use client';
+
 import ImageUploader from "@/components/Admin/ImageUploader";
 
 export default function UploadPage() {
