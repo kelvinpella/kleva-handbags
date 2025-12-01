@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { uploadMultipleImages, createProduct, updateProduct, fetchProductById } from "@/lib/actions";
 import ProductForm, { ProductFormData } from "@/components/Admin/ProductForm";
 import { IMAGE_UPLOAD_CONFIG } from "@/lib/constants";
+import { calculateSellingPrice } from "@/lib/pricing";
 
 function AddProductContent() {
   const router = useRouter();
@@ -82,7 +83,31 @@ function AddProductContent() {
     >
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // If buying price changes, automatically calculate selling price
+    if (name === "buying_price") {
+      const buyingPrice = parseFloat(value) || 0;
+
+      // Validate that buying price is positive
+      if (buyingPrice < 0) {
+        setError("Buying price cannot be negative");
+        return;
+      }
+
+      // Clear any previous errors
+      if (error && error.includes("price")) {
+        setError("");
+      }
+
+      const sellingPrice = calculateSellingPrice(buyingPrice);
+      setFormData((prev) => ({
+        ...prev,
+        buying_price: value,
+        selling_price: sellingPrice > 0 ? sellingPrice.toString() : ""
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,6 +153,18 @@ function AddProductContent() {
 
       if (!formData.name || !formData.description || !formData.selling_price) {
         throw new Error("Please fill in all required fields");
+      }
+
+      // Validate buying price
+      const buyingPrice = formData.buying_price ? parseFloat(formData.buying_price) : 0;
+      if (buyingPrice <= 0) {
+        throw new Error("Buying price must be greater than 0");
+      }
+
+      // Validate selling price
+      const sellingPrice = parseFloat(formData.selling_price);
+      if (sellingPrice <= 0) {
+        throw new Error("Selling price must be greater than 0");
       }
 
       // Upload new images if any
