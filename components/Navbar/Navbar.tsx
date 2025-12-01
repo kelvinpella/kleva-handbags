@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { NAVIGATION_ITEMS } from "@/lib/constants";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,20 +26,16 @@ export default function Navbar() {
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6 md:gap-8">
-          <Link
-            href="/new"
-            className="text-sm pb-0.5 font-semibold text-neutral-900  transition-colors border-b-2 border-transparent hover:border-black flex flex-col items-center justify-center gap-1"
-          >
-            <span>New</span>
-            <span className="italic text-xs font-normal">(Mpya)</span>
-          </Link>
-          <Link
-            href="/second-hand"
-            className="text-sm pb-0.5 font-semibold text-neutral-900 transition-colors whitespace-nowrap border-b-2 border-transparent hover:border-black flex flex-col items-center justify-center gap-1"
-          >
-            <span>Second-Hand</span>
-            <span className="italic text-xs font-normal">(Mtumba)</span>
-          </Link>
+          {NAVIGATION_ITEMS.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="text-sm pb-0.5 font-semibold text-neutral-900  transition-colors border-b-2 border-transparent hover:border-black flex flex-col items-center justify-center gap-1"
+            >
+              <span>{item.name}</span>
+              <span className="italic text-xs font-normal">({item.swahili})</span>
+            </Link>
+          ))}
         </nav>
 
         {/* Hamburger Button */}
@@ -109,22 +106,17 @@ export default function Navbar() {
             </button>
           </div>
           <nav className="flex flex-col gap-4 p-4 flex-1">
-            <Link
-              href="/new"
-              onClick={closeMenu}
-              className="text-sm py-3 font-semibold text-neutral-900 transition-colors border-b-2 border-transparent hover:border-black flex flex-col items-start gap-1"
-            >
-              <span>New</span>
-              <span className="italic text-xs font-normal">(Mpya)</span>
-            </Link>
-            <Link
-              href="/second-hand"
-              onClick={closeMenu}
-              className="text-sm py-3 font-semibold text-neutral-900 transition-colors whitespace-nowrap border-b-2 border-transparent hover:border-black flex flex-col items-start gap-1"
-            >
-              <span>Second-Hand</span>
-              <span className="italic text-xs font-normal">(Mtumba)</span>
-            </Link>
+            {NAVIGATION_ITEMS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={closeMenu}
+                className="text-sm py-3 font-semibold text-neutral-900 transition-colors border-b-2 border-transparent hover:border-black flex flex-col items-start gap-1"
+              >
+                <span>{item.name}</span>
+                <span className="italic text-xs font-normal">({item.swahili})</span>
+              </Link>
+            ))}
           </nav>
         </div>
       </div>

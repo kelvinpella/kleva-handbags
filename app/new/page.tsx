@@ -3,8 +3,7 @@ import ProductGrid from '@/components/ProductGrid';
 import Pagination from '@/components/Pagination';
 import ScrollToTop from '@/components/ScrollToTop';
 import { Handbag } from '@/typings';
-
-const ITEMS_PER_PAGE = 12;
+import { ITEMS_PER_PAGE } from '@/lib/constants';
 
 export const metadata = {
   title: 'New Handbags - Kleva Handbags',

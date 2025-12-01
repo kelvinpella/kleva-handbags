@@ -38,12 +38,18 @@ export default function Pagination({ currentPage, totalPages, basePath }: Pagina
     return pages;
   };
 
+  // Helper to build URL with page parameter
+  const buildUrl = (pageNum: number) => {
+    const separator = basePath.includes('?') ? '&' : '?';
+    return `${basePath}${separator}page=${pageNum}`;
+  };
+
   return (
     <div className="flex justify-center items-center space-x-1 mt-12 mb-8">
       {/* Previous Button */}
       {currentPage > 1 ? (
         <Link
-          href={`${basePath}?page=${currentPage - 1}`}
+          href={buildUrl(currentPage - 1)}
           scroll={true}
           className="px-4 py-2 border border-neutral-300 text-sm font-medium text-neutral-900 bg-white hover:bg-neutral-50 transition-colors min-w-[90px]"
         >
@@ -75,9 +81,9 @@ export default function Pagination({ currentPage, totalPages, basePath }: Pagina
           return (
             <Link
               key={pageNum}
-              href={`${basePath}?page=${pageNum}`}
+              href={buildUrl(pageNum)}
               scroll={true}
-              className={`min-w-[44px] px-4 py-2 border text-sm font-medium transition-colors ${
+              className={`min-w-11 px-4 py-2 border text-sm font-medium transition-colors ${
                 isActive
                   ? 'bg-neutral-900 text-white border-neutral-900'
                   : 'border-neutral-300 text-neutral-900 bg-white hover:bg-neutral-50'
@@ -99,7 +105,7 @@ export default function Pagination({ currentPage, totalPages, basePath }: Pagina
       {/* Next Button */}
       {currentPage < totalPages ? (
         <Link
-          href={`${basePath}?page=${currentPage + 1}`}
+          href={buildUrl(currentPage + 1)}
           scroll={true}
           className="px-4 py-2 border border-neutral-300 text-sm font-medium text-neutral-900 bg-white hover:bg-neutral-50 transition-colors min-w-[90px]"
         >
