@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useCallback, FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import { loginAction } from "@/lib/actions";
 import { createClient } from "@/lib/supabase/client";
 
@@ -28,8 +29,11 @@ const MESSAGES = {
 } as const;
 
 export default function LoginClient() {
+  const searchParams = useSearchParams();
+  const initialError = searchParams?.get("error") ?? null;
+
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(initialError);
 
   // Sign in with Google (OAuth)
   const handleGoogleSignIn = useCallback(async () => {
