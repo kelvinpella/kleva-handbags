@@ -93,7 +93,7 @@ export default function SalesCounter({
             <span className="text-neutral-700 font-medium">−</span>
           </button>
 
-          <span className="text-sm font-medium text-neutral-900 min-w-[2rem] text-center">
+          <span className="text-sm font-medium text-neutral-900 min-w-8 text-center">
             {itemsSold}
           </span>
 

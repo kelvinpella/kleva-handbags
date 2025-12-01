@@ -13,60 +13,8 @@ export default async function AdminDashboard() {
         <p className="text-neutral-600 mt-2">Welcome to your admin dashboard</p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white border border-neutral-200 rounded-lg p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-neutral-600">Total Products</p>
-              <p className="text-3xl font-bold text-neutral-900 mt-2">
-                {stats.totalProducts}
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-neutral-100 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white border border-neutral-200 rounded-lg p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-neutral-600">New Products</p>
-              <p className="text-3xl font-bold text-neutral-900 mt-2">
-                {stats.newProducts}
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white border border-neutral-200 rounded-lg p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-neutral-600">Second Hand</p>
-              <p className="text-3xl font-bold text-neutral-900 mt-2">
-                {stats.secondHandProducts}
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Profits Section */}
       <div className="mb-8">
-        <h2 className="text-xl font-bold text-neutral-900 mb-4">Profit Overview</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white border border-neutral-200 rounded-lg p-6">
             <div className="flex items-center justify-between">

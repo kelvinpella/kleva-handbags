@@ -569,7 +569,21 @@ export async function incrementSale(data: {
       return { success: false, error: "Quantity must be greater than 0" };
     }
 
-    // 1. Record the sale in the sales table
+    // 1. Get current product data
+    const { data: product, error: fetchError } = await supabase
+      .from("handbags")
+      .select("items_sold")
+      .eq("id", data.productId)
+      .single();
+
+    if (fetchError) {
+      console.error("Error fetching product:", fetchError);
+      return { success: false, error: "Failed to fetch product" };
+    }
+
+    const currentItemsSold = product?.items_sold || 0;
+
+    // 2. Record the sale in the sales table
     const saleResult = await recordSale({
       product_id: data.productId,
       product_name: data.productName,
@@ -584,26 +598,16 @@ export async function incrementSale(data: {
       return { success: false, error: saleResult.error };
     }
 
-    // 2. Increment items_sold in the products table
-    const { data: product, error: fetchError } = await supabase
-      .from("handbags")
-      .select("items_sold")
-      .eq("id", data.productId)
-      .single();
-
-    if (fetchError) {
-      console.error("Error fetching product:", fetchError);
-      return { success: false, error: "Failed to fetch product" };
-    }
-
-    const currentItemsSold = product?.items_sold || 0;
+    // 3. Update items_sold
     const { error: updateError } = await supabase
       .from("handbags")
-      .update({ items_sold: currentItemsSold + data.quantity })
+      .update({
+        items_sold: currentItemsSold + data.quantity
+      })
       .eq("id", data.productId);
 
     if (updateError) {
-      console.error("Error updating items_sold:", updateError);
+      console.error("Error updating product:", updateError);
       return { success: false, error: "Failed to update product" };
     }
 
@@ -637,7 +641,7 @@ export async function decrementSale(data: {
       return { success: false, error: "Quantity must be greater than 0" };
     }
 
-    // 1. Get the current items_sold count
+    // 1. Get current product data
     const { data: product, error: fetchError } = await supabase
       .from("handbags")
       .select("items_sold")
@@ -650,6 +654,7 @@ export async function decrementSale(data: {
     }
 
     const currentItemsSold = product?.items_sold || 0;
+
     if (currentItemsSold < data.quantity) {
       return { success: false, error: `Cannot return ${data.quantity} items. Only ${currentItemsSold} items sold.` };
     }
@@ -669,14 +674,16 @@ export async function decrementSale(data: {
       return { success: false, error: returnResult.error };
     }
 
-    // 3. Decrement items_sold in the products table
+    // 3. Decrement items_sold
     const { error: updateError } = await supabase
       .from("handbags")
-      .update({ items_sold: Math.max(0, currentItemsSold - data.quantity) })
+      .update({
+        items_sold: Math.max(0, currentItemsSold - data.quantity)
+      })
       .eq("id", data.productId);
 
     if (updateError) {
-      console.error("Error updating items_sold:", updateError);
+      console.error("Error updating product:", updateError);
       return { success: false, error: "Failed to update product" };
     }
 
