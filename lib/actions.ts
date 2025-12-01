@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 
 export async function loginAction(email: string, password: string) {
@@ -184,33 +185,123 @@ export async function createProduct(productData: {
 }
 
 /**
- * Fetch products with optional filtering by condition
+ * Fetch products with optional filtering by condition, pagination, and search
  */
 export async function fetchProducts(
-  filter?: "all" | "new" | "second-hand"
-): Promise<{ success: boolean; data?: any[]; error?: string }> {
+  filter?: "all" | "new" | "second-hand",
+  page: number = 1,
+  itemsPerPage: number = 12,
+  searchQuery?: string
+): Promise<{ success: boolean; data?: any[]; count?: number; error?: string }> {
   try {
     const supabase = await createClient();
+    const from = (page - 1) * itemsPerPage;
+    const to = from + itemsPerPage - 1;
+
     let query = supabase
       .from("handbags")
-      .select("*")
+      .select("*", { count: "exact" })
       .order("created_at", { ascending: false });
 
     if (filter && filter !== "all") {
       query = query.eq("condition", filter);
     }
 
-    const { data, error } = await query;
+    // Add search filtering
+    if (searchQuery && searchQuery.trim()) {
+      query = query.or(
+        `name.ilike.%${searchQuery}%,brand.ilike.%${searchQuery}%`
+      );
+    }
+
+    // Apply pagination
+    query = query.range(from, to);
+
+    const { data, error, count } = await query;
 
     if (error) {
       console.error("Error fetching products:", error);
       return { success: false, error: error.message };
     }
 
-    return { success: true, data: data || [] };
+    return { success: true, data: data || [], count: count || 0 };
   } catch (error: any) {
     console.error("Fetch products error:", error);
     return { success: false, error: error.message || "Failed to fetch products" };
+  }
+}
+
+/**
+ * Fetch a single product by ID
+ */
+export async function fetchProductById(
+  id: string
+): Promise<{ success: boolean; data?: any; error?: string }> {
+  try {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from("handbags")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      console.error("Error fetching product:", error);
+      return { success: false, error: error.message };
+    }
+
+    if (!data) {
+      return { success: false, error: "Product not found" };
+    }
+
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("Fetch product error:", error);
+    return { success: false, error: error.message || "Failed to fetch product" };
+  }
+}
+
+/**
+ * Update a product by ID
+ */
+export async function updateProduct(
+  id: string,
+  productData: {
+    name: string;
+    description: string;
+    condition: string;
+    brand: string;
+    material: string;
+    images: string[];
+    stock_status: string;
+    dimensions?: string;
+    number_of_colors_available?: number;
+    buying_price?: number;
+    selling_price?: number;
+    items_sold?: number;
+  }
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient();
+
+    const { error: updateError } = await supabase
+      .from("handbags")
+      .update(productData)
+      .eq("id", id);
+
+    if (updateError) {
+      console.error("Error updating product:", updateError);
+      return { success: false, error: updateError.message };
+    }
+
+    // Revalidate the products page to show updated list
+    revalidatePath("/admin/products");
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Update product error:", error);
+    return { success: false, error: error.message || "Failed to update product" };
   }
 }
 
@@ -222,12 +313,49 @@ export async function deleteProduct(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient();
-    const { error } = await supabase.from("handbags").delete().eq("id", id);
 
-    if (error) {
-      console.error("Error deleting product:", error);
-      return { success: false, error: error.message };
+    // First, fetch the product to get its images
+    const { data: product, error: fetchError } = await supabase
+      .from("handbags")
+      .select("images")
+      .eq("id", id)
+      .single();
+
+    if (fetchError) {
+      console.error("Error fetching product:", fetchError);
+      return { success: false, error: fetchError.message };
     }
+
+    // Delete the product from the database
+    const { error: deleteError } = await supabase
+      .from("handbags")
+      .delete()
+      .eq("id", id);
+
+    if (deleteError) {
+      console.error("Error deleting product:", deleteError);
+      return { success: false, error: deleteError.message };
+    }
+
+    // Delete associated images from storage
+    if (product?.images && Array.isArray(product.images) && product.images.length > 0) {
+      const imagePaths = await Promise.all(
+        product.images.map((imageUrl: string) => getPathFromUrl(imageUrl))
+      );
+
+      const { error: storageError } = await supabase.storage
+        .from(BUCKET_NAME)
+        .remove(imagePaths);
+
+      if (storageError) {
+        console.error("Error deleting images from storage:", storageError);
+        // Don't fail the whole operation if image deletion fails
+        // The product is already deleted from the database
+      }
+    }
+
+    // Revalidate the products page to show updated list
+    revalidatePath("/admin/products");
 
     return { success: true };
   } catch (error: any) {

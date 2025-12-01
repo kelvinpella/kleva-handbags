@@ -292,12 +292,13 @@ export default function ProductForm({
         {/* Buying Price */}
         <div>
           <label htmlFor="buying_price" className="block text-sm font-medium text-neutral-900 mb-2">
-            Buying Price (TSh)
+            Buying Price (TSh) <span className="text-red-600">*</span>
           </label>
           <input
             type="number"
             id="buying_price"
             name="buying_price"
+            required
             step="1"
             min="0"
             value={initialData?.buying_price || ''}

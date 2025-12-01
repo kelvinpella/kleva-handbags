@@ -1,68 +1,30 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Handbag } from "@/typings";
-import { PRODUCT_CONDITIONS, CONDITION_LABELS } from "@/lib/constants";
-import { fetchProducts, deleteProduct as deleteProductAction } from "@/lib/actions";
+import { PRODUCT_CONDITIONS, CONDITION_LABELS, ITEMS_PER_PAGE } from "@/lib/constants";
+import { fetchProducts } from "@/lib/actions";
+import Pagination from "@/components/Pagination";
+import ProductsClient from "./ProductsClient";
+import DeleteButton from "./DeleteButton";
 
-export default function ProductsListPage() {
-  const [products, setProducts] = useState<Handbag[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "new" | "second-hand">("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [error, setError] = useState<string | null>(null);
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
-  useEffect(() => {
-    loadProducts();
-  }, [filter]);
+export default async function ProductsListPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const params = await Promise.resolve(searchParams);
+  const currentPage = Number(params.page) || 1;
+  const filter = (params.filter as "all" | "new" | "second-hand") || "all";
+  const searchQuery = (params.search as string) || "";
 
-  async function loadProducts() {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await fetchProducts(filter);
+  const result = await fetchProducts(filter, currentPage, ITEMS_PER_PAGE, searchQuery);
 
-      if (!result.success) {
-        setError(result.error || "Failed to fetch products");
-        setProducts([]);
-      } else {
-        setProducts(result.data || []);
-      }
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      setError("An unexpected error occurred");
-      setProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleDeleteProduct(id: string) {
-    if (!confirm("Are you sure you want to delete this product?")) return;
-
-    try {
-      const result = await deleteProductAction(id);
-
-      if (!result.success) {
-        alert(result.error || "Failed to delete product");
-        return;
-      }
-
-      setProducts((prev) => prev.filter((p) => p.id !== id));
-      alert("Product deleted successfully");
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      alert("Failed to delete product");
-    }
-  }
-
-  const filteredProducts = products.filter(
-    (product) =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.brand.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const products = result.data || [];
+  const totalCount = result.count || 0;
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+  const startItem = totalCount > 0 ? (currentPage - 1) * ITEMS_PER_PAGE + 1 : 0;
+  const endItem = Math.min(currentPage * ITEMS_PER_PAGE, totalCount);
 
   return (
     <div>
@@ -70,7 +32,7 @@ export default function ProductsListPage() {
         <div>
           <h1 className="text-3xl font-bold text-neutral-900">Products</h1>
           <p className="text-neutral-600 mt-2">
-            Manage your handbag inventory ({filteredProducts.length} products)
+            Manage your handbag inventory ({totalCount} products)
           </p>
         </div>
         <Link
@@ -94,71 +56,14 @@ export default function ProductsListPage() {
         </Link>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white border border-neutral-200 rounded-lg p-4 mb-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-          {/* Search */}
-          <div className="relative flex-1 max-w-md">
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-            />
-            <svg
-              className="w-5 h-5 text-neutral-400 absolute left-3 top-1/2 transform -translate-y-1/2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </div>
-
-          {/* Filter Buttons */}
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setFilter("all")}
-              className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                filter === "all"
-                  ? "bg-neutral-900 text-white"
-                  : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setFilter(PRODUCT_CONDITIONS.NEW)}
-              className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                filter === PRODUCT_CONDITIONS.NEW
-                  ? "bg-neutral-900 text-white"
-                  : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
-              }`}
-            >
-              New
-            </button>
-            <button
-              onClick={() => setFilter(PRODUCT_CONDITIONS.SECOND_HAND)}
-              className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                filter === PRODUCT_CONDITIONS.SECOND_HAND
-                  ? "bg-neutral-900 text-white"
-                  : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
-              }`}
-            >
-              Second Hand
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Client-side filters and search */}
+      <ProductsClient
+        currentFilter={filter}
+        currentSearch={searchQuery}
+      />
 
       {/* Error Message */}
-      {error && (
+      {!result.success && result.error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
           <div className="flex items-center space-x-2">
             <svg
@@ -174,17 +79,20 @@ export default function ProductsListPage() {
                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <p className="text-red-800 font-medium">{error}</p>
+            <p className="text-red-800 font-medium">{result.error}</p>
           </div>
         </div>
       )}
 
-      {/* Products Table */}
-      {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neutral-900"></div>
+      {/* Products Count */}
+      {totalCount > 0 && (
+        <div className="mb-4 text-sm text-neutral-600">
+          Showing {startItem} - {endItem} of {totalCount} products
         </div>
-      ) : filteredProducts.length === 0 ? (
+      )}
+
+      {/* Products Table */}
+      {products.length === 0 ? (
         <div className="bg-white border border-neutral-200 rounded-lg p-12 text-center">
           <svg
             className="w-16 h-16 text-neutral-300 mx-auto mb-4"
@@ -204,7 +112,7 @@ export default function ProductsListPage() {
           </h3>
           <p className="text-neutral-600 mb-6">
             {searchQuery
-              ? "Try adjusting your search"
+              ? "Try adjusting your search or filters"
               : "Get started by adding your first product"}
           </p>
           {!searchQuery && (
@@ -230,161 +138,108 @@ export default function ProductsListPage() {
           )}
         </div>
       ) : (
-        <div className="bg-white border border-neutral-200 rounded-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-neutral-50 border-b border-neutral-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
-                    Product
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
-                    Brand
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
-                    Price
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
-                    Condition
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-neutral-600 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-200">
-                {filteredProducts.map((product) => (
-                  <tr
-                    key={product.id}
-                    className="hover:bg-neutral-50 transition-colors"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="flex items-center space-x-4">
-                        <div className="relative w-16 h-16 bg-neutral-100 rounded-lg overflow-hidden shrink-0">
-                          <Image
-                            src={product.images[0]}
-                            alt={product.name}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium text-neutral-900 truncate">
-                            {product.name}
-                          </p>
-                          <p className="text-sm text-neutral-600 truncate">
-                            {product.material}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-neutral-900">
-                      {product.brand}
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-neutral-900">
-                      TSh {product.selling_price.toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
-                          product.condition === PRODUCT_CONDITIONS.NEW
-                            ? "bg-green-100 text-green-800"
-                            : "bg-orange-100 text-orange-800"
-                        }`}
-                      >
-                        {CONDITION_LABELS[product.condition]}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
-                          product.stock_status === "in_stock"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {product.stock_status === "in_stock"
-                          ? "In Stock"
-                          : "Out of Stock"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end space-x-2">
-                        <Link
-                          href={`/product/${product.id}`}
-                          target="_blank"
-                          className="p-2 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 rounded transition-colors"
-                          title="View"
-                        >
-                          <svg
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                            />
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                            />
-                          </svg>
-                        </Link>
-                        <Link
-                          href={`/admin/products/edit/${product.id}`}
-                          className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded transition-colors"
-                          title="Edit"
-                        >
-                          <svg
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                            />
-                          </svg>
-                        </Link>
-                        <button
-                          onClick={() => handleDeleteProduct(product.id)}
-                          className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded transition-colors"
-                          title="Delete"
-                        >
-                          <svg
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
+        <>
+          <div className="bg-white border border-neutral-200 rounded-lg overflow-hidden mb-6">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-neutral-50 border-b border-neutral-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
+                      Product
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
+                      Brand
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
+                      Price
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
+                      Condition
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-neutral-600 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-neutral-200">
+                  {products.map((product) => (
+                    <tr
+                      key={product.id}
+                      className="hover:bg-neutral-50 transition-colors"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-4">
+                          <div className="relative w-16 h-16 bg-neutral-100 rounded-lg overflow-hidden shrink-0">
+                            <Image
+                              src={product.images[0]}
+                              alt={product.name}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-neutral-900 truncate">
+                              {product.name}
+                            </p>
+                            <p className="text-sm text-neutral-600 truncate">
+                              {product.material}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-neutral-900">
+                        {product.brand}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-medium text-neutral-900">
+                        TSh {product.selling_price.toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
+                            product.condition === PRODUCT_CONDITIONS.NEW
+                              ? "bg-green-100 text-green-800"
+                              : "bg-orange-100 text-orange-800"
+                          }`}
+                        >
+                          {CONDITION_LABELS[product.condition as keyof typeof CONDITION_LABELS]}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
+                            product.stock_status === "in_stock"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {product.stock_status === "in_stock"
+                            ? "In Stock"
+                            : "Out of Stock"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <DeleteButton productId={product.id} />
+                       
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              basePath={`/admin/products?filter=${filter}${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""}`}
+            />
+          )}
+        </>
       )}
     </div>
   );
