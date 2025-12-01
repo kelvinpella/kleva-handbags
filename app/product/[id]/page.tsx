@@ -95,7 +95,7 @@ export default async function ProductPage({ params }: PageProps) {
             {/* Price */}
             <div className="flex items-baseline space-x-3">
               <span className="text-3xl font-bold text-red-600">
-                TSh {handbag.selling_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                TSh {handbag.selling_price.toLocaleString('en-US')}
               </span>
             </div>
 

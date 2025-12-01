@@ -97,8 +97,8 @@ export default function AddProductPage() {
         stock_status: formData.stock_status,
         dimensions: formData.dimensions,
         number_of_colors_available: formData.number_of_colors_available ? parseInt(formData.number_of_colors_available) : 1,
-        buying_price: formData.buying_price ? parseFloat(formData.buying_price) : undefined,
-        selling_price: parseFloat(formData.selling_price),
+        buying_price: formData.buying_price ? parseInt(formData.buying_price) : undefined,
+        selling_price: parseInt(formData.selling_price),
         items_sold: formData.items_sold ? parseInt(formData.items_sold) : 0,
       });
 

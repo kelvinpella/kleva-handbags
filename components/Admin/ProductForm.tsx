@@ -280,12 +280,12 @@ export default function ProductForm({
             id="selling_price"
             name="selling_price"
             required
-            step="0.01"
+            step="1"
             min="0"
             value={initialData?.selling_price || initialData?.price || ''}
             onChange={onInputChange}
             className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-            placeholder="e.g., 89999.00"
+            placeholder="e.g., 89999"
           />
         </div>
 
@@ -298,12 +298,12 @@ export default function ProductForm({
             type="number"
             id="buying_price"
             name="buying_price"
-            step="0.01"
+            step="1"
             min="0"
             value={initialData?.buying_price || ''}
             onChange={onInputChange}
             className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-            placeholder="e.g., 50000.00"
+            placeholder="e.g., 50000"
           />
         </div>
 
