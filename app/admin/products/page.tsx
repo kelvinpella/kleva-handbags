@@ -5,6 +5,7 @@ import { fetchProducts } from "@/lib/actions";
 import Pagination from "@/components/Pagination";
 import ProductsClient from "./ProductsClient";
 import DeleteButton from "./DeleteButton";
+import SalesCounter from "./SalesCounter";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -159,6 +160,9 @@ export default async function ProductsListPage({
                     <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
                       Status
                     </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
+                      Sales
+                    </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-neutral-600 uppercase tracking-wider">
                       Actions
                     </th>
@@ -220,9 +224,19 @@ export default async function ProductsListPage({
                             : "Out of Stock"}
                         </span>
                       </td>
+                      <td className="px-6 py-4">
+                        <SalesCounter
+                          productId={product.id}
+                          productName={product.name}
+                          productCondition={product.condition}
+                          buyingPrice={product.buying_price || 0}
+                          sellingPrice={product.selling_price || 0}
+                          initialItemsSold={product.items_sold || 0}
+                        />
+                      </td>
                       <td className="px-6 py-4 text-right">
                         <DeleteButton productId={product.id} />
-                       
+
                       </td>
                     </tr>
                   ))}

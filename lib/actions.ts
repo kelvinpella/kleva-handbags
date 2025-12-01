@@ -403,13 +403,297 @@ export async function getDashboardStats() {
       throw secondHandError;
     }
 
+    // Calculate profits from sales table
+    const { data: allSales, error: salesError } = await supabase
+      .from("sales")
+      .select("profit, product_condition");
+
+    if (salesError) {
+      console.error("Error fetching sales for profit calculation:", salesError);
+      throw salesError;
+    }
+
+    // Calculate total profit and profit by condition
+    let totalProfit = 0;
+    let newHandbagsProfit = 0;
+    let secondHandProfit = 0;
+
+    allSales?.forEach((sale) => {
+      const profit = sale.profit || 0;
+      totalProfit += profit;
+
+      if (sale.product_condition === "new") {
+        newHandbagsProfit += profit;
+      } else if (sale.product_condition === "second-hand") {
+        secondHandProfit += profit;
+      }
+    });
+
     return {
       totalProducts: totalProducts || 0,
       newProducts: newProducts || 0,
       secondHandProducts: secondHandProducts || 0,
+      totalProfit,
+      newHandbagsProfit,
+      secondHandProfit,
     };
   } catch (error: any) {
     console.error("Dashboard stats error:", error);
     throw new Error(error.message || "Failed to fetch dashboard stats");
+  }
+}
+
+/**
+ * Record a sale transaction
+ */
+export async function recordSale(saleData: {
+  product_id?: string;
+  product_name: string;
+  product_condition: "new" | "second-hand";
+  quantity: number;
+  buying_price: number;
+  selling_price: number;
+  sale_date?: string;
+  notes?: string;
+}): Promise<{ success: boolean; error?: string; id?: string }> {
+  try {
+    const supabase = await createClient();
+
+    const { data, error: insertError } = await supabase
+      .from("sales")
+      .insert([saleData])
+      .select();
+
+    if (insertError) {
+      console.error("Error recording sale:", insertError);
+      return { success: false, error: insertError.message };
+    }
+
+    if (!data || data.length === 0) {
+      return { success: false, error: "Failed to record sale" };
+    }
+
+    // Revalidate the admin dashboard to show updated profit stats
+    revalidatePath("/admin");
+
+    return { success: true, id: data[0].id };
+  } catch (error: any) {
+    console.error("Record sale error:", error);
+    return { success: false, error: error.message || "Failed to record sale" };
+  }
+}
+
+/**
+ * Fetch all sales with optional filtering
+ */
+export async function fetchSales(
+  filter?: "all" | "new" | "second-hand",
+  page: number = 1,
+  itemsPerPage: number = 20
+): Promise<{ success: boolean; data?: any[]; count?: number; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const from = (page - 1) * itemsPerPage;
+    const to = from + itemsPerPage - 1;
+
+    let query = supabase
+      .from("sales")
+      .select("*", { count: "exact" })
+      .order("sale_date", { ascending: false });
+
+    if (filter && filter !== "all") {
+      query = query.eq("product_condition", filter);
+    }
+
+    query = query.range(from, to);
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      console.error("Error fetching sales:", error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data: data || [], count: count || 0 };
+  } catch (error: any) {
+    console.error("Fetch sales error:", error);
+    return { success: false, error: error.message || "Failed to fetch sales" };
+  }
+}
+
+/**
+ * Delete a sale record
+ */
+export async function deleteSale(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient();
+
+    const { error: deleteError } = await supabase
+      .from("sales")
+      .delete()
+      .eq("id", id);
+
+    if (deleteError) {
+      console.error("Error deleting sale:", deleteError);
+      return { success: false, error: deleteError.message };
+    }
+
+    // Revalidate the admin dashboard to show updated profit stats
+    revalidatePath("/admin");
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Delete sale error:", error);
+    return { success: false, error: error.message || "Failed to delete sale" };
+  }
+}
+
+/**
+ * Increment sale - Record a sale and update items_sold
+ */
+export async function incrementSale(data: {
+  productId: string;
+  productName: string;
+  productCondition: "new" | "second-hand";
+  buyingPrice: number;
+  sellingPrice: number;
+  quantity: number;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient();
+
+    // Validate quantity
+    if (data.quantity <= 0) {
+      return { success: false, error: "Quantity must be greater than 0" };
+    }
+
+    // 1. Get current product data
+    const { data: product, error: fetchError } = await supabase
+      .from("handbags")
+      .select("items_sold")
+      .eq("id", data.productId)
+      .single();
+
+    if (fetchError) {
+      console.error("Error fetching product:", fetchError);
+      return { success: false, error: "Failed to fetch product" };
+    }
+
+    const currentItemsSold = product?.items_sold || 0;
+
+    // 2. Record the sale in the sales table
+    const saleResult = await recordSale({
+      product_id: data.productId,
+      product_name: data.productName,
+      product_condition: data.productCondition,
+      quantity: data.quantity,
+      buying_price: data.buyingPrice,
+      selling_price: data.sellingPrice,
+      notes: `Sale recorded via products page (${data.quantity} item${data.quantity > 1 ? 's' : ''})`,
+    });
+
+    if (!saleResult.success) {
+      return { success: false, error: saleResult.error };
+    }
+
+    // 3. Update items_sold
+    const { error: updateError } = await supabase
+      .from("handbags")
+      .update({
+        items_sold: currentItemsSold + data.quantity
+      })
+      .eq("id", data.productId);
+
+    if (updateError) {
+      console.error("Error updating product:", updateError);
+      return { success: false, error: "Failed to update product" };
+    }
+
+    // Revalidate the products page and dashboard
+    revalidatePath("/admin/products");
+    revalidatePath("/admin");
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Increment sale error:", error);
+    return { success: false, error: error.message || "Failed to record sale" };
+  }
+}
+
+/**
+ * Decrement sale - Record returns and update items_sold
+ */
+export async function decrementSale(data: {
+  productId: string;
+  productName: string;
+  productCondition: "new" | "second-hand";
+  buyingPrice: number;
+  sellingPrice: number;
+  quantity: number;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient();
+
+    // Validate quantity
+    if (data.quantity <= 0) {
+      return { success: false, error: "Quantity must be greater than 0" };
+    }
+
+    // 1. Get current product data
+    const { data: product, error: fetchError } = await supabase
+      .from("handbags")
+      .select("items_sold")
+      .eq("id", data.productId)
+      .single();
+
+    if (fetchError) {
+      console.error("Error fetching product:", fetchError);
+      return { success: false, error: "Failed to fetch product" };
+    }
+
+    const currentItemsSold = product?.items_sold || 0;
+
+    if (currentItemsSold < data.quantity) {
+      return { success: false, error: `Cannot return ${data.quantity} items. Only ${currentItemsSold} items sold.` };
+    }
+
+    // 2. Record the return as a negative sale in the sales table
+    const returnResult = await recordSale({
+      product_id: data.productId,
+      product_name: data.productName,
+      product_condition: data.productCondition,
+      quantity: -data.quantity, // Negative quantity represents a return
+      buying_price: data.buyingPrice,
+      selling_price: data.sellingPrice,
+      notes: `Return recorded via products page (${data.quantity} item${data.quantity > 1 ? 's' : ''} returned)`,
+    });
+
+    if (!returnResult.success) {
+      return { success: false, error: returnResult.error };
+    }
+
+    // 3. Decrement items_sold
+    const { error: updateError } = await supabase
+      .from("handbags")
+      .update({
+        items_sold: Math.max(0, currentItemsSold - data.quantity)
+      })
+      .eq("id", data.productId);
+
+    if (updateError) {
+      console.error("Error updating product:", updateError);
+      return { success: false, error: "Failed to update product" };
+    }
+
+    // Revalidate the products page and dashboard
+    revalidatePath("/admin/products");
+    revalidatePath("/admin");
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Decrement sale error:", error);
+    return { success: false, error: error.message || "Failed to record return" };
   }
 }

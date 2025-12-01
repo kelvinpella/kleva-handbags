@@ -270,25 +270,6 @@ export default function ProductForm({
 
       {/* Pricing and Inventory */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Selling Price */}
-        <div>
-          <label htmlFor="selling_price" className="block text-sm font-medium text-neutral-900 mb-2">
-            Selling Price (TSh) <span className="text-red-600">*</span>
-          </label>
-          <input
-            type="number"
-            id="selling_price"
-            name="selling_price"
-            required
-            step="1"
-            min="0"
-            value={initialData?.selling_price || initialData?.price || ''}
-            onChange={onInputChange}
-            className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-            placeholder="e.g., 89999"
-          />
-        </div>
-
         {/* Buying Price */}
         <div>
           <label htmlFor="buying_price" className="block text-sm font-medium text-neutral-900 mb-2">
@@ -305,6 +286,25 @@ export default function ProductForm({
             onChange={onInputChange}
             className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
             placeholder="e.g., 50000"
+          />
+        </div>
+
+        {/* Selling Price */}
+        <div>
+          <label htmlFor="selling_price" className="block text-sm font-medium text-neutral-900 mb-2">
+            Selling Price (TSh) <span className="text-red-600">*</span>
+          </label>
+          <input
+            type="number"
+            id="selling_price"
+            name="selling_price"
+            required
+            step="1"
+            min="0"
+            value={initialData?.selling_price || initialData?.price || ''}
+            onChange={onInputChange}
+            className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
+            placeholder="e.g., 89999"
           />
         </div>
 
