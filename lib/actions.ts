@@ -174,3 +174,56 @@ export async function createProduct(productData: {
     return { success: false, error: error.message || "Failed to create product" };
   }
 }
+
+/**
+ * Fetch products with optional filtering by condition
+ */
+export async function fetchProducts(
+  filter?: "all" | "new" | "second-hand"
+): Promise<{ success: boolean; data?: any[]; error?: string }> {
+  try {
+    const supabase = await createClient();
+    let query = supabase
+      .from("handbags")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (filter && filter !== "all") {
+      query = query.eq("condition", filter);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error("Error fetching products:", error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data: data || [] };
+  } catch (error: any) {
+    console.error("Fetch products error:", error);
+    return { success: false, error: error.message || "Failed to fetch products" };
+  }
+}
+
+/**
+ * Delete a product by ID
+ */
+export async function deleteProduct(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.from("handbags").delete().eq("id", id);
+
+    if (error) {
+      console.error("Error deleting product:", error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Delete product error:", error);
+    return { success: false, error: error.message || "Failed to delete product" };
+  }
+}

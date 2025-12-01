@@ -5,50 +5,50 @@ import Link from "next/link";
 import Image from "next/image";
 import { Handbag } from "@/typings";
 import { PRODUCT_CONDITIONS, CONDITION_LABELS } from "@/lib/constants";
-import { createClient } from "@/lib/supabase/client";
-
-const supabase = createClient();
+import { fetchProducts, deleteProduct as deleteProductAction } from "@/lib/actions";
 
 export default function ProductsListPage() {
   const [products, setProducts] = useState<Handbag[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "new" | "second-hand">("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchProducts();
+    loadProducts();
   }, [filter]);
 
-  async function fetchProducts() {
+  async function loadProducts() {
     setLoading(true);
+    setError(null);
     try {
-      let query = supabase
-        .from("handbags")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const result = await fetchProducts(filter);
 
-      if (filter !== "all") {
-        query = query.eq("condition", filter);
+      if (!result.success) {
+        setError(result.error || "Failed to fetch products");
+        setProducts([]);
+      } else {
+        setProducts(result.data || []);
       }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      setProducts(data || []);
     } catch (error) {
       console.error("Error fetching products:", error);
+      setError("An unexpected error occurred");
+      setProducts([]);
     } finally {
       setLoading(false);
     }
   }
 
-  async function deleteProduct(id: string) {
+  async function handleDeleteProduct(id: string) {
     if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
-      const { error } = await supabase.from("handbags").delete().eq("id", id);
+      const result = await deleteProductAction(id);
 
-      if (error) throw error;
+      if (!result.success) {
+        alert(result.error || "Failed to delete product");
+        return;
+      }
 
       setProducts((prev) => prev.filter((p) => p.id !== id));
       alert("Product deleted successfully");
@@ -157,6 +157,28 @@ export default function ProductsListPage() {
         </div>
       </div>
 
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center space-x-2">
+            <svg
+              className="w-5 h-5 text-red-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <p className="text-red-800 font-medium">{error}</p>
+          </div>
+        </div>
+      )}
+
       {/* Products Table */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
@@ -241,7 +263,7 @@ export default function ProductsListPage() {
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-4">
-                        <div className="relative w-16 h-16 bg-neutral-100 rounded-lg overflow-hidden flex-shrink-0">
+                        <div className="relative w-16 h-16 bg-neutral-100 rounded-lg overflow-hidden shrink-0">
                           <Image
                             src={product.images[0]}
                             alt={product.name}
@@ -337,7 +359,7 @@ export default function ProductsListPage() {
                           </svg>
                         </Link>
                         <button
-                          onClick={() => deleteProduct(product.id)}
+                          onClick={() => handleDeleteProduct(product.id)}
                           className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded transition-colors"
                           title="Delete"
                         >
