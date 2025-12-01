@@ -1,5 +1,6 @@
-import { supabase } from './supabase';
+import { createClient } from "./supabase/client";
 
+const supabase = createClient()
 const BUCKET_NAME = 'handbag-images';
 
 /**

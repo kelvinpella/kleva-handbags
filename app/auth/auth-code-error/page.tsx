@@ -24,7 +24,7 @@ export default function AuthCodeErrorPage() {
           Authentication Error
         </h2>
         <p className="text-neutral-600 mb-8">
-          There was an issue signing you in with Google. This could be due to an invalid or expired authentication code. Please try signing in again.
+          There was an issue signing you in. This could be due to an invalid or expired authentication code. Please try signing in again.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link

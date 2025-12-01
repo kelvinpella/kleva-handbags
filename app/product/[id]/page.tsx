@@ -134,7 +134,7 @@ export default async function ProductPage({ params }: PageProps) {
                 <div className="flex justify-between py-2 border-b border-neutral-100">
                   <dt className="text-neutral-600">Condition</dt>
                   <dd className="font-medium text-neutral-900">
-                    {CONDITION_LABELS[handbag.condition]}
+                    {CONDITION_LABELS[handbag.condition as keyof typeof CONDITION_LABELS]}
                   </dd>
                 </div>
               </dl>

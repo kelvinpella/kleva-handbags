@@ -1,38 +1,6 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from "./supabase/client";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-let supabaseInstance: SupabaseClient | null = null;
-
-function getSupabase() {
-  if (supabaseInstance) {
-    return supabaseInstance;
-  }
-
-  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-    }
-  });
-
-  return supabaseInstance;
-}
-
-export const supabase = getSupabase();
-
-/**
- * Retrieve the currently authenticated user without modifying any application state.
- * This calls Supabase's `auth.getUser()` which reads the user from the auth session
- * but does not change any React state in your app.
- */
-export async function getUserNoState() {
-  const { data, error } = await supabase.auth.getUser();
-  return { user: data?.user ?? null, error };
-}
+const supabase = createClient()
 
 export async function getHandbags(
   condition: 'new' | 'second-hand',

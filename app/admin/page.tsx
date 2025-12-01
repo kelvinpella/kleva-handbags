@@ -1,8 +1,8 @@
 'use client';
 
+import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -14,6 +14,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     async function fetchStats() {
+      const supabase = createClient()
       const { count: total } = await supabase
         .from('handbags')
         .select('*', { count: 'exact', head: true });

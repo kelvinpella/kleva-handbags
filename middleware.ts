@@ -5,6 +5,11 @@ export const proxy = async (request: NextRequest) => {
   return await updateSession(request)
 }
 
+// Backwards-compatible export: some Next.js versions still expect a named
+// `middleware` export. Export it here as an alias to `proxy` so both the
+// new `proxy` convention and older `middleware` consumers work.
+export const middleware = proxy
+
 export const config = {
   matcher: [
     /*

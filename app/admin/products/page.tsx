@@ -1,17 +1,19 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Handbag } from '@/typings';
-import { PRODUCT_CONDITIONS, CONDITION_LABELS } from '@/lib/constants';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Handbag } from "@/typings";
+import { PRODUCT_CONDITIONS, CONDITION_LABELS } from "@/lib/constants";
+import { createClient } from "@/lib/supabase/client";
+
+const supabase = createClient();
 
 export default function ProductsListPage() {
   const [products, setProducts] = useState<Handbag[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'new' | 'second-hand'>('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [filter, setFilter] = useState<"all" | "new" | "second-hand">("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchProducts();
@@ -21,12 +23,12 @@ export default function ProductsListPage() {
     setLoading(true);
     try {
       let query = supabase
-        .from('handbags')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .from("handbags")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-      if (filter !== 'all') {
-        query = query.eq('condition', filter);
+      if (filter !== "all") {
+        query = query.eq("condition", filter);
       }
 
       const { data, error } = await query;
@@ -34,25 +36,25 @@ export default function ProductsListPage() {
       if (error) throw error;
       setProducts(data || []);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error("Error fetching products:", error);
     } finally {
       setLoading(false);
     }
   }
 
   async function deleteProduct(id: string) {
-    if (!confirm('Are you sure you want to delete this product?')) return;
+    if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
-      const { error } = await supabase.from('handbags').delete().eq('id', id);
+      const { error } = await supabase.from("handbags").delete().eq("id", id);
 
       if (error) throw error;
 
       setProducts((prev) => prev.filter((p) => p.id !== id));
-      alert('Product deleted successfully');
+      alert("Product deleted successfully");
     } catch (error) {
-      console.error('Error deleting product:', error);
-      alert('Failed to delete product');
+      console.error("Error deleting product:", error);
+      alert("Failed to delete product");
     }
   }
 
@@ -75,8 +77,18 @@ export default function ProductsListPage() {
           href="/admin/products/add"
           className="px-6 py-3 bg-neutral-900 text-white rounded-md hover:bg-neutral-800 transition-colors font-medium inline-flex items-center space-x-2"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 4v16m8-8H4"
+            />
           </svg>
           <span>Add Product</span>
         </Link>
@@ -112,11 +124,11 @@ export default function ProductsListPage() {
           {/* Filter Buttons */}
           <div className="flex items-center space-x-2">
             <button
-              onClick={() => setFilter('all')}
+              onClick={() => setFilter("all")}
               className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                filter === 'all'
-                  ? 'bg-neutral-900 text-white'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                filter === "all"
+                  ? "bg-neutral-900 text-white"
+                  : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
               }`}
             >
               All
@@ -125,8 +137,8 @@ export default function ProductsListPage() {
               onClick={() => setFilter(PRODUCT_CONDITIONS.NEW)}
               className={`px-4 py-2 rounded-md font-medium transition-colors ${
                 filter === PRODUCT_CONDITIONS.NEW
-                  ? 'bg-neutral-900 text-white'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                  ? "bg-neutral-900 text-white"
+                  : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
               }`}
             >
               New
@@ -135,8 +147,8 @@ export default function ProductsListPage() {
               onClick={() => setFilter(PRODUCT_CONDITIONS.SECOND_HAND)}
               className={`px-4 py-2 rounded-md font-medium transition-colors ${
                 filter === PRODUCT_CONDITIONS.SECOND_HAND
-                  ? 'bg-neutral-900 text-white'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                  ? "bg-neutral-900 text-white"
+                  : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
               }`}
             >
               Second Hand
@@ -165,17 +177,31 @@ export default function ProductsListPage() {
               d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
             />
           </svg>
-          <h3 className="text-lg font-medium text-neutral-900 mb-2">No products found</h3>
+          <h3 className="text-lg font-medium text-neutral-900 mb-2">
+            No products found
+          </h3>
           <p className="text-neutral-600 mb-6">
-            {searchQuery ? 'Try adjusting your search' : 'Get started by adding your first product'}
+            {searchQuery
+              ? "Try adjusting your search"
+              : "Get started by adding your first product"}
           </p>
           {!searchQuery && (
             <Link
               href="/admin/products/add"
               className="inline-flex items-center space-x-2 px-6 py-3 bg-neutral-900 text-white rounded-md hover:bg-neutral-800 transition-colors font-medium"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
               <span>Add Your First Product</span>
             </Link>
@@ -209,7 +235,10 @@ export default function ProductsListPage() {
               </thead>
               <tbody className="divide-y divide-neutral-200">
                 {filteredProducts.map((product) => (
-                  <tr key={product.id} className="hover:bg-neutral-50 transition-colors">
+                  <tr
+                    key={product.id}
+                    className="hover:bg-neutral-50 transition-colors"
+                  >
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-4">
                         <div className="relative w-16 h-16 bg-neutral-100 rounded-lg overflow-hidden flex-shrink-0">
@@ -221,12 +250,18 @@ export default function ProductsListPage() {
                           />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="font-medium text-neutral-900 truncate">{product.name}</p>
-                          <p className="text-sm text-neutral-600 truncate">{product.color}</p>
+                          <p className="font-medium text-neutral-900 truncate">
+                            {product.name}
+                          </p>
+                          <p className="text-sm text-neutral-600 truncate">
+                            {product.color}
+                          </p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-neutral-900">{product.brand}</td>
+                    <td className="px-6 py-4 text-sm text-neutral-900">
+                      {product.brand}
+                    </td>
                     <td className="px-6 py-4 text-sm font-medium text-neutral-900">
                       TSh {product.price.toLocaleString()}
                     </td>
@@ -234,8 +269,8 @@ export default function ProductsListPage() {
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
                           product.condition === PRODUCT_CONDITIONS.NEW
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-orange-100 text-orange-800'
+                            ? "bg-green-100 text-green-800"
+                            : "bg-orange-100 text-orange-800"
                         }`}
                       >
                         {CONDITION_LABELS[product.condition]}
@@ -244,12 +279,14 @@ export default function ProductsListPage() {
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
-                          product.stock_status === 'in_stock'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
+                          product.stock_status === "in_stock"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {product.stock_status === 'in_stock' ? 'In Stock' : 'Out of Stock'}
+                        {product.stock_status === "in_stock"
+                          ? "In Stock"
+                          : "Out of Stock"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -260,7 +297,12 @@ export default function ProductsListPage() {
                           className="p-2 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 rounded transition-colors"
                           title="View"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -280,7 +322,12 @@ export default function ProductsListPage() {
                           className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded transition-colors"
                           title="Edit"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -294,7 +341,12 @@ export default function ProductsListPage() {
                           className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded transition-colors"
                           title="Delete"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"

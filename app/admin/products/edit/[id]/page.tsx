@@ -2,18 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
 import { uploadMultipleImages, getPathFromUrl } from '@/lib/supabase-storage';
 import ProductForm, { ProductFormData } from '@/components/Admin/ProductForm';
 import { Handbag } from '@/typings';
 import { IMAGE_UPLOAD_CONFIG } from '@/lib/constants';
+import { createClient } from '@/lib/supabase/client';
 
 interface PageProps {
   params: {
     id: string;
   };
 }
-
+const supabase = createClient()
 export default function EditProductPage({ params }: PageProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
