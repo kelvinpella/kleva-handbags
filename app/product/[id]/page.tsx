@@ -95,7 +95,7 @@ export default async function ProductPage({ params }: PageProps) {
             {/* Price */}
             <div className="flex items-baseline space-x-3">
               <span className="text-3xl font-bold text-red-600">
-                TSh {handbag.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                TSh {handbag.selling_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>
 
@@ -124,19 +124,27 @@ export default async function ProductPage({ params }: PageProps) {
                   <dd className="font-medium text-neutral-900">{handbag.brand}</dd>
                 </div>
                 <div className="flex justify-between py-2 border-b border-neutral-100">
-                  <dt className="text-neutral-600">Color</dt>
-                  <dd className="font-medium text-neutral-900">{handbag.color}</dd>
-                </div>
-                <div className="flex justify-between py-2 border-b border-neutral-100">
                   <dt className="text-neutral-600">Material</dt>
                   <dd className="font-medium text-neutral-900">{handbag.material}</dd>
                 </div>
+                {handbag.dimensions && (
+                  <div className="flex justify-between py-2 border-b border-neutral-100">
+                    <dt className="text-neutral-600">Dimensions</dt>
+                    <dd className="font-medium text-neutral-900">{handbag.dimensions}</dd>
+                  </div>
+                )}
                 <div className="flex justify-between py-2 border-b border-neutral-100">
                   <dt className="text-neutral-600">Condition</dt>
                   <dd className="font-medium text-neutral-900">
                     {CONDITION_LABELS[handbag.condition as keyof typeof CONDITION_LABELS]}
                   </dd>
                 </div>
+                {handbag.number_of_colors_available && handbag.number_of_colors_available > 1 && (
+                  <div className="flex justify-between py-2 border-b border-neutral-100">
+                    <dt className="text-neutral-600">Available Colors</dt>
+                    <dd className="font-medium text-neutral-900">{handbag.number_of_colors_available}</dd>
+                  </div>
+                )}
               </dl>
             </div>
 
@@ -146,7 +154,7 @@ export default async function ProductPage({ params }: PageProps) {
                 <WhatsAppButton
                   phoneNumber={whatsappNumber}
                   productName={handbag.name}
-                  productPrice={handbag.price}
+                  productPrice={handbag.selling_price}
                   productUrl={productUrl}
                 />
                 <p className="text-xs italic text-center mt-3">

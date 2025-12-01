@@ -31,7 +31,7 @@ export default function ProductCard({ handbag }: ProductCardProps) {
           </h3>
           <div className="flex items-baseline space-x-2 pt-1">
             <span className="text-base font-bold text-red-600">
-              TSh {handbag.price.toLocaleString()}
+              TSh {handbag.selling_price.toLocaleString()}
             </span>
           </div>
         </div>

@@ -285,7 +285,7 @@ export default function ProductsListPage() {
                       {product.brand}
                     </td>
                     <td className="px-6 py-4 text-sm font-medium text-neutral-900">
-                      TSh {product.price.toLocaleString()}
+                      TSh {product.selling_price.toLocaleString()}
                     </td>
                     <td className="px-6 py-4">
                       <span
