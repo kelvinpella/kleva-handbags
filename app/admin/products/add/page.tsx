@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { uploadMultipleImages } from "@/lib/supabase-storage";
+import { uploadMultipleImages, createProduct } from "@/lib/actions";
 import ProductForm, { ProductFormData } from "@/components/Admin/ProductForm";
 import { IMAGE_UPLOAD_CONFIG, DEFAULT_WHATSAPP_PREFIX } from "@/lib/constants";
-import { createClient } from "@/lib/supabase/client";
 
 export default function AddProductPage() {
   const router = useRouter();
@@ -77,33 +76,30 @@ export default function AddProductPage() {
 
       // Upload images
       setUploadingImages(true);
-      const imageUrls = await uploadMultipleImages(imageFiles);
+      const imageUrls = await uploadMultipleImages(imageFiles, formData.condition);
       setUploadingImages(false);
 
       if (imageUrls.length === 0) {
         throw new Error("Failed to upload images");
       }
-      const supabase = createClient();
-      // Insert product
-      const { data, error: insertError } = await supabase
-        .from("handbags")
-        .insert([
-          {
-            name: formData.name,
-            description: formData.description,
-            price: parseFloat(formData.price),
-            condition: formData.condition,
-            brand: formData.brand,
-            color: formData.color,
-            material: formData.material,
-            images: imageUrls,
-            whatsapp_number: formData.whatsapp_number,
-            stock_status: formData.stock_status,
-          },
-        ])
-        .select();
 
-      if (insertError) throw insertError;
+      // Create product using server action
+      const result = await createProduct({
+        name: formData.name,
+        description: formData.description,
+        price: parseFloat(formData.price),
+        condition: formData.condition,
+        brand: formData.brand,
+        color: formData.color,
+        material: formData.material,
+        images: imageUrls,
+        whatsapp_number: formData.whatsapp_number,
+        stock_status: formData.stock_status,
+      });
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to create product");
+      }
 
       // Success
       router.push("/admin/products");

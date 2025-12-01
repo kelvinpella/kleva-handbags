@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { uploadMultipleImages, getPathFromUrl } from '@/lib/supabase-storage';
+import { uploadMultipleImages, getPathFromUrl } from '@/lib/actions';
 import ProductForm, { ProductFormData } from '@/components/Admin/ProductForm';
 import { Handbag } from '@/typings';
 import { IMAGE_UPLOAD_CONFIG } from '@/lib/constants';
@@ -125,7 +125,7 @@ export default function EditProductPage({ params }: PageProps) {
       let newImageUrls: string[] = [];
       if (newImageFiles.length > 0) {
         setUploadingImages(true);
-        newImageUrls = await uploadMultipleImages(newImageFiles);
+        newImageUrls = await uploadMultipleImages(newImageFiles, formData.condition);
         setUploadingImages(false);
       }
 

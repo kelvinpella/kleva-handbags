@@ -1,15 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { uploadMultipleImages } from '@/lib/supabase-storage';
+import { uploadMultipleImages } from '@/lib/actions';
 import Image from 'next/image';
 
 interface ImageUploaderProps {
   onImagesUploaded?: (urls: string[]) => void;
   maxImages?: number;
+  condition?: string;
 }
 
-export default function ImageUploader({ onImagesUploaded, maxImages = 5 }: ImageUploaderProps) {
+export default function ImageUploader({ onImagesUploaded, maxImages = 5, condition = 'new' }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
   const [error, setError] = useState<string>('');
@@ -28,7 +29,7 @@ export default function ImageUploader({ onImagesUploaded, maxImages = 5 }: Image
 
     try {
       const fileArray = Array.from(files);
-      const urls = await uploadMultipleImages(fileArray);
+      const urls = await uploadMultipleImages(fileArray, condition);
       
       if (urls.length > 0) {
         setUploadedUrls(urls);
