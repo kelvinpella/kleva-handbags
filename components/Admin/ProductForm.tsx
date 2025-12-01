@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { IMAGE_UPLOAD_CONFIG } from '@/lib/constants';
+import { getProfitPercentage } from '@/lib/pricing';
 
 export interface ProductFormData {
   name: string;
@@ -281,18 +282,26 @@ export default function ProductForm({
             name="buying_price"
             required
             step="1"
-            min="0"
+            min="1"
             value={initialData?.buying_price || ''}
             onChange={onInputChange}
             className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
             placeholder="e.g., 50000"
           />
+          <p className="mt-1 text-xs text-neutral-500">
+            Enter a positive value to auto-calculate selling price
+          </p>
         </div>
 
         {/* Selling Price */}
         <div>
           <label htmlFor="selling_price" className="block text-sm font-medium text-neutral-900 mb-2">
             Selling Price (TSh) <span className="text-red-600">*</span>
+            {initialData?.buying_price && (
+              <span className="ml-2 text-xs font-normal text-green-600">
+                (+{Math.round(getProfitPercentage(parseFloat(initialData.buying_price)) * 100)}% profit)
+              </span>
+            )}
           </label>
           <input
             type="number"
@@ -300,12 +309,16 @@ export default function ProductForm({
             name="selling_price"
             required
             step="1"
-            min="0"
+            min="1"
             value={initialData?.selling_price || initialData?.price || ''}
             onChange={onInputChange}
-            className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-            placeholder="e.g., 89999"
+            className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent bg-neutral-50"
+            placeholder="Auto-calculated from buying price"
+            readOnly
           />
+          <p className="mt-1 text-xs text-neutral-500">
+            Automatically calculated with profit percentage and rounded to nearest thousand
+          </p>
         </div>
 
         {/* Number of Colors Available */}
