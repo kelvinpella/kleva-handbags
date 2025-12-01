@@ -363,3 +363,53 @@ export async function deleteProduct(
     return { success: false, error: error.message || "Failed to delete product" };
   }
 }
+
+/**
+ * Fetch dashboard statistics
+ */
+export async function getDashboardStats() {
+  try {
+    const supabase = await createClient();
+
+    // Get total products count
+    const { count: totalProducts, error: totalError } = await supabase
+      .from("handbags")
+      .select("*", { count: "exact", head: true });
+
+    if (totalError) {
+      console.error("Error fetching total products:", totalError);
+      throw totalError;
+    }
+
+    // Get new products count
+    const { count: newProducts, error: newError } = await supabase
+      .from("handbags")
+      .select("*", { count: "exact", head: true })
+      .eq("condition", "new");
+
+    if (newError) {
+      console.error("Error fetching new products:", newError);
+      throw newError;
+    }
+
+    // Get second-hand products count
+    const { count: secondHandProducts, error: secondHandError } = await supabase
+      .from("handbags")
+      .select("*", { count: "exact", head: true })
+      .eq("condition", "second-hand");
+
+    if (secondHandError) {
+      console.error("Error fetching second-hand products:", secondHandError);
+      throw secondHandError;
+    }
+
+    return {
+      totalProducts: totalProducts || 0,
+      newProducts: newProducts || 0,
+      secondHandProducts: secondHandProducts || 0,
+    };
+  } catch (error: any) {
+    console.error("Dashboard stats error:", error);
+    throw new Error(error.message || "Failed to fetch dashboard stats");
+  }
+}

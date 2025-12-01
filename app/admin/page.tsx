@@ -1,44 +1,8 @@
-'use client';
-
-import { createClient } from '@/lib/supabase/client';
+import { getDashboardStats } from '@/lib/actions';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
-export default function AdminDashboard() {
-  const [stats, setStats] = useState({
-    totalProducts: 0,
-    newProducts: 0,
-    secondHandProducts: 0,
-    loading: true,
-  });
-
-  useEffect(() => {
-    async function fetchStats() {
-      const supabase = createClient()
-      const { count: total } = await supabase
-        .from('handbags')
-        .select('*', { count: 'exact', head: true });
-
-      const { count: newCount } = await supabase
-        .from('handbags')
-        .select('*', { count: 'exact', head: true })
-        .eq('condition', 'new');
-
-      const { count: secondHandCount } = await supabase
-        .from('handbags')
-        .select('*', { count: 'exact', head: true })
-        .eq('condition', 'second-hand');
-
-      setStats({
-        totalProducts: total || 0,
-        newProducts: newCount || 0,
-        secondHandProducts: secondHandCount || 0,
-        loading: false,
-      });
-    }
-
-    fetchStats();
-  }, []);
+export default async function AdminDashboard() {
+  const stats = await getDashboardStats();
 
   return (
     <div>
@@ -54,7 +18,7 @@ export default function AdminDashboard() {
             <div>
               <p className="text-sm font-medium text-neutral-600">Total Products</p>
               <p className="text-3xl font-bold text-neutral-900 mt-2">
-                {stats.loading ? '...' : stats.totalProducts}
+                {stats.totalProducts}
               </p>
             </div>
             <div className="w-12 h-12 bg-neutral-100 rounded-lg flex items-center justify-center">
@@ -70,7 +34,7 @@ export default function AdminDashboard() {
             <div>
               <p className="text-sm font-medium text-neutral-600">New Products</p>
               <p className="text-3xl font-bold text-neutral-900 mt-2">
-                {stats.loading ? '...' : stats.newProducts}
+                {stats.newProducts}
               </p>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -86,7 +50,7 @@ export default function AdminDashboard() {
             <div>
               <p className="text-sm font-medium text-neutral-600">Second Hand</p>
               <p className="text-3xl font-bold text-neutral-900 mt-2">
-                {stats.loading ? '...' : stats.secondHandProducts}
+                {stats.secondHandProducts}
               </p>
             </div>
             <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">

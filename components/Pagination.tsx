@@ -83,7 +83,7 @@ export default function Pagination({ currentPage, totalPages, basePath }: Pagina
               key={pageNum}
               href={buildUrl(pageNum)}
               scroll={true}
-              className={`min-w-[44px] px-4 py-2 border text-sm font-medium transition-colors ${
+              className={`min-w-11 px-4 py-2 border text-sm font-medium transition-colors ${
                 isActive
                   ? 'bg-neutral-900 text-white border-neutral-900'
                   : 'border-neutral-300 text-neutral-900 bg-white hover:bg-neutral-50'
