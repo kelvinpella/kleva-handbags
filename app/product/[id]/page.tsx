@@ -39,7 +39,7 @@ export default async function ProductPage({ params }: PageProps) {
   }
 
   const similarHandbags = await getSimilarHandbags(resolvedParams.id, handbag.condition);
-  const productUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/product/${resolvedParams.id}`;
+  const productUrl = `/product/${resolvedParams.id}`;
   const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || handbag.whatsapp_number;
 
   return (

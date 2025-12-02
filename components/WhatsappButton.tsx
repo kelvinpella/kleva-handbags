@@ -14,8 +14,12 @@ export default function WhatsAppButton({
   productUrl,
 }: WhatsAppButtonProps) {
   const handleWhatsAppClick = () => {
+    // Ensure we use the full URL with correct protocol
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const fullUrl = productUrl.startsWith('http') ? productUrl : `${origin}${productUrl}`;
+
     const message = encodeURIComponent(
-      `Habari, ninapenda kujua zaidi kuhusu:\n\n${productName}\nBei: TSh ${productPrice.toLocaleString()}\n\nLink: ${productUrl}`
+      `Habari, ninapenda kujua zaidi kuhusu:\n\n${productName}\nBei: TSh ${productPrice.toLocaleString()}\n\nLink: ${fullUrl}`
     );
     const whatsappUrl = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${message}`;
     window.open(whatsappUrl, '_blank');
