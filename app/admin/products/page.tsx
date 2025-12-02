@@ -161,6 +161,9 @@ export default async function ProductsListPage({
                       Status
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
+                      Store
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
                       Sales
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-neutral-600 uppercase tracking-wider">
@@ -223,6 +226,9 @@ export default async function ProductsListPage({
                             ? "In Stock"
                             : "Out of Stock"}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-neutral-900">
+                        {product.store || "-"}
                       </td>
                       <td className="px-6 py-4">
                         <SalesCounter

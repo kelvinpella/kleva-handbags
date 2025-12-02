@@ -13,6 +13,7 @@ export interface Handbag {
     dimensions?: string;
     number_of_colors_available?: number;
     items_sold?: number;
+    store?: string;
   }
   
   export interface PaginationInfo {
