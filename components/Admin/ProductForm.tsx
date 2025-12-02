@@ -17,6 +17,7 @@ export interface ProductFormData {
   buying_price?: string;
   selling_price?: string;
   items_sold?: string;
+  store?: string;
 }
 
 interface ProductFormProps {
@@ -248,6 +249,22 @@ export default function ProductForm({
             onChange={onInputChange}
             className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
             placeholder="e.g., 30cm x 20cm x 10cm"
+          />
+        </div>
+
+        {/* Store */}
+        <div>
+          <label htmlFor="store" className="block text-sm font-medium text-neutral-900 mb-2">
+            Store
+          </label>
+          <input
+            type="text"
+            id="store"
+            name="store"
+            value={initialData?.store || ''}
+            onChange={onInputChange}
+            className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
+            placeholder="e.g., Main Store"
           />
         </div>
       </div>

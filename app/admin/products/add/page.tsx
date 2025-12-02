@@ -31,6 +31,7 @@ function AddProductContent() {
     buying_price: "",
     selling_price: "",
     items_sold: "0",
+    store: "",
   });
 
   const [existingImages, setExistingImages] = useState<string[]>([]);
@@ -64,6 +65,7 @@ function AddProductContent() {
           buying_price: data.buying_price?.toString() || "",
           selling_price: data.selling_price?.toString() || data.price?.toString() || "",
           items_sold: data.items_sold?.toString() || "0",
+          store: data.store || "",
         });
         setExistingImages(data.images || []);
       } catch (err: any) {
@@ -195,6 +197,7 @@ function AddProductContent() {
         buying_price: formData.buying_price ? parseInt(formData.buying_price) : undefined,
         selling_price: parseInt(formData.selling_price),
         items_sold: formData.items_sold ? parseInt(formData.items_sold) : 0,
+        store: formData.store || undefined,
       };
 
       let result;
