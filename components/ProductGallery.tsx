@@ -23,7 +23,7 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
               src={images[selectedImage]}
               alt={`${productName} - Image ${selectedImage + 1}`}
               fill
-              className="object-cover"
+              className="object-contain"
               priority
               sizes="(max-width: 768px) 100vw, 50vw"
             />

@@ -239,7 +239,7 @@ export default function ProductForm({
         {/* Dimensions */}
         <div>
           <label htmlFor="dimensions" className="block text-sm font-medium text-neutral-900 mb-2">
-            Dimensions
+            Size
           </label>
           <input
             type="text"

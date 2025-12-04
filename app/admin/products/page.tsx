@@ -1,6 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
-import { PRODUCT_CONDITIONS, CONDITION_LABELS, ITEMS_PER_PAGE } from "@/lib/constants";
+import {
+  PRODUCT_CONDITIONS,
+  CONDITION_LABELS,
+  ITEMS_PER_PAGE,
+} from "@/lib/constants";
 import { fetchProducts } from "@/lib/actions";
 import Pagination from "@/components/Pagination";
 import ProductsClient from "./ProductsClient";
@@ -19,7 +23,12 @@ export default async function ProductsListPage({
   const filter = (params.filter as "all" | "new" | "second-hand") || "all";
   const searchQuery = (params.search as string) || "";
 
-  const result = await fetchProducts(filter, currentPage, ITEMS_PER_PAGE, searchQuery);
+  const result = await fetchProducts(
+    filter,
+    currentPage,
+    ITEMS_PER_PAGE,
+    searchQuery
+  );
 
   const products = result.data || [];
   const totalCount = result.count || 0;
@@ -58,10 +67,7 @@ export default async function ProductsListPage({
       </div>
 
       {/* Client-side filters and search */}
-      <ProductsClient
-        currentFilter={filter}
-        currentSearch={searchQuery}
-      />
+      <ProductsClient currentFilter={filter} currentSearch={searchQuery} />
 
       {/* Error Message */}
       {!result.success && result.error && (
@@ -152,7 +158,7 @@ export default async function ProductsListPage({
                       Brand
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
-                      Price
+                      Price (TSh)
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-neutral-600 uppercase tracking-wider">
                       Condition
@@ -187,8 +193,8 @@ export default async function ProductsListPage({
                               className="object-cover"
                             />
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="font-medium text-neutral-900 truncate">
+                          <div className="min-w-0 max-w-sm flex-1">
+                            <p className="w-full font-medium text-neutral-900">
                               {product.name}
                             </p>
                             <p className="text-sm text-neutral-600 truncate">
@@ -201,7 +207,7 @@ export default async function ProductsListPage({
                         {product.brand}
                       </td>
                       <td className="px-6 py-4 text-sm font-medium text-neutral-900">
-                        TSh {product.selling_price.toLocaleString()}
+                        {product.selling_price.toLocaleString()}
                       </td>
                       <td className="px-6 py-4">
                         <span
@@ -211,7 +217,11 @@ export default async function ProductsListPage({
                               : "bg-orange-100 text-orange-800"
                           }`}
                         >
-                          {CONDITION_LABELS[product.condition as keyof typeof CONDITION_LABELS]}
+                          {
+                            CONDITION_LABELS[
+                              product.condition as keyof typeof CONDITION_LABELS
+                            ]
+                          }
                         </span>
                       </td>
                       <td className="px-6 py-4">
@@ -242,7 +252,6 @@ export default async function ProductsListPage({
                       </td>
                       <td className="px-6 py-4 text-right">
                         <DeleteButton productId={product.id} />
-
                       </td>
                     </tr>
                   ))}
@@ -256,7 +265,9 @@ export default async function ProductsListPage({
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
-              basePath={`/admin/products?filter=${filter}${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""}`}
+              basePath={`/admin/products?filter=${filter}${
+                searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""
+              }`}
             />
           )}
         </>

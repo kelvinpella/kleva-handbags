@@ -12,11 +12,11 @@ export default function ProductCard({ handbag }: ProductCardProps) {
       <div className="bg-white overflow-hidden">
         {/* Product Image */}
         <div className="relative aspect-3/4 bg-neutral-100 overflow-hidden mb-3">
-          <Image
+          <Image 
             src={handbag.images[0]}
             alt={handbag.name}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+            className="object-contain group-hover:scale-105 transition-transform duration-700 ease-out"
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
           />
         </div>
