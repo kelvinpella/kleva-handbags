@@ -129,7 +129,7 @@ export default async function ProductPage({ params }: PageProps) {
                 </div>
                 {handbag.dimensions && (
                   <div className="flex justify-between py-2 border-b border-neutral-100">
-                    <dt className="text-neutral-600">Dimensions</dt>
+                    <dt className="text-neutral-600">Size</dt>
                     <dd className="font-medium text-neutral-900">{handbag.dimensions}</dd>
                   </div>
                 )}

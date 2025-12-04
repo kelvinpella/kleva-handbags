@@ -18,12 +18,12 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
       <div className="space-y-4">
         {/* Main Image */}
         <div className="relative group">
-          <div className="relative aspect-3/4 bg-neutral-100 overflow-hidden">
+          <div className="relative w-full aspect-square bg-neutral-100 overflow-hidden">
             <Image
               src={images[selectedImage]}
               alt={`${productName} - Image ${selectedImage + 1}`}
               fill
-              className="object-cover"
+              className="object-contain"
               priority
               sizes="(max-width: 768px) 100vw, 50vw"
             />
@@ -73,6 +73,7 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
                   alt={`${productName} thumbnail ${index + 1}`}
                   fill
                   className="object-cover"
+                  loading="lazy"
                   sizes="(max-width: 768px) 25vw, 15vw"
                 />
               </button>

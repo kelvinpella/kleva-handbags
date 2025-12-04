@@ -18,7 +18,6 @@ export async function getHandbags(
     .range(from, to);
 
   if (error) {
-    console.log('Error fetching handbags:', error);
     return { data: [], count: 0 };
   }
 
@@ -26,7 +25,6 @@ export async function getHandbags(
 }
 
 export async function getHandbagById(id: string) {
-  console.log('Fetching handbag with ID:', id);
   
   const { data, error } = await supabase
     .from('handbags')
@@ -35,11 +33,9 @@ export async function getHandbagById(id: string) {
     .single();
 
   if (error) {
-    console.log('Error fetching handbag:', error);
     return null;
   }
 
-  console.log('Fetched handbag:', data);
   return data;
 }
 
