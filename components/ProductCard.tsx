@@ -16,6 +16,7 @@ export default function ProductCard({ handbag }: ProductCardProps) {
             src={handbag.images[0]}
             alt={handbag.name}
             fill
+            loading="lazy"
             className="object-contain group-hover:scale-105 transition-transform duration-700 ease-out"
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
           />

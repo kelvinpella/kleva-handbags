@@ -190,6 +190,7 @@ export default async function ProductsListPage({
                               src={product.images[0]}
                               alt={product.name}
                               fill
+                              loading="lazy"
                               className="object-cover"
                             />
                           </div>
@@ -211,7 +212,7 @@ export default async function ProductsListPage({
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
+                          className={`inline-flex whitespace-nowrap px-2 py-1 text-xs font-medium rounded ${
                             product.condition === PRODUCT_CONDITIONS.NEW
                               ? "bg-green-100 text-green-800"
                               : "bg-orange-100 text-orange-800"
@@ -226,7 +227,7 @@ export default async function ProductsListPage({
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
+                          className={`inline-flex whitespace-nowrap px-2 py-1 text-xs font-medium rounded ${
                             product.stock_status === "in_stock"
                               ? "bg-green-100 text-green-800"
                               : "bg-red-100 text-red-800"
