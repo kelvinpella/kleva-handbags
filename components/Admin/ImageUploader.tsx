@@ -3,14 +3,16 @@
 import { useState } from 'react';
 import { uploadMultipleImages } from '@/lib/actions';
 import Image from 'next/image';
+import { v4 as uuidv4 } from 'uuid';
 
 interface ImageUploaderProps {
   onImagesUploaded?: (urls: string[]) => void;
   maxImages?: number;
   condition?: string;
+  productId?: string;
 }
 
-export default function ImageUploader({ onImagesUploaded, maxImages = 5, condition = 'new' }: ImageUploaderProps) {
+export default function ImageUploader({ onImagesUploaded, maxImages = 5, condition = 'new', productId }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
   const [error, setError] = useState<string>('');
@@ -29,8 +31,10 @@ export default function ImageUploader({ onImagesUploaded, maxImages = 5, conditi
 
     try {
       const fileArray = Array.from(files);
-      const urls = await uploadMultipleImages(fileArray, condition);
-      
+      // Generate a temporary product ID if not provided
+      const tempProductId = productId || uuidv4();
+      const urls = await uploadMultipleImages(fileArray, condition, tempProductId);
+
       if (urls.length > 0) {
         setUploadedUrls(urls);
         onImagesUploaded?.(urls);

@@ -43,15 +43,17 @@ export async function signoutAction() {
 const BUCKET_NAME = "handbag-images";
 
 /**
- * Upload an image to Supabase Storage organized by condition
+ * Upload an image to Supabase Storage organized by condition and product ID
  * @param file - The file to upload
- * @param condition - The product condition (e.g., 'new', 'like-new', 'good', 'fair')
- * @param path - Optional filename within the condition folder
+ * @param condition - The product condition (e.g., 'new', 'second-hand')
+ * @param productId - The product UUID
+ * @param path - Optional filename within the product folder
  * @returns The public URL of the uploaded image
  */
 export async function uploadImage(
   file: File,
   condition: string,
+  productId: string,
   path?: string
 ): Promise<string | null> {
   try {
@@ -61,8 +63,8 @@ export async function uploadImage(
       path ||
       `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
 
-    // Organize by condition folder
-    const filePath = `${condition}/${fileName}`;
+    // Organize by condition/productId/filename
+    const filePath = `${condition}/${productId}/${fileName}`;
 
     const { data, error } = await supabase.storage
       .from(BUCKET_NAME)
@@ -90,10 +92,11 @@ export async function uploadImage(
 
 export async function uploadMultipleImages(
   files: File[],
-  condition: string
+  condition: string,
+  productId: string
 ): Promise<string[]> {
   const uploadPromises = files.map((file) =>
-    uploadImage(file, condition)
+    uploadImage(file, condition, productId)
   );
   const results = await Promise.all(uploadPromises);
   return results.filter((url): url is string => url !== null);
@@ -118,6 +121,53 @@ export async function deleteImage(path: string): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Delete all images for a product from storage
+ * @param condition - The product condition (e.g., 'new', 'second-hand')
+ * @param productId - The product UUID
+ */
+export async function deleteProductImages(
+  condition: string,
+  productId: string
+): Promise<boolean> {
+  try {
+    const supabase = await createClient();
+
+    // List all files in the product's folder
+    const folderPath = `${condition}/${productId}`;
+    const { data: files, error: listError } = await supabase.storage
+      .from(BUCKET_NAME)
+      .list(folderPath);
+
+    if (listError) {
+      console.error("Error listing product images:", listError);
+      return false;
+    }
+
+    if (!files || files.length === 0) {
+      // No images to delete
+      return true;
+    }
+
+    // Delete all files in the folder
+    const filePaths = files.map((file) => `${folderPath}/${file.name}`);
+    const { error: deleteError } = await supabase.storage
+      .from(BUCKET_NAME)
+      .remove(filePaths);
+
+    if (deleteError) {
+      console.error("Error deleting product images:", deleteError);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Delete product images error:", error);
+    return false;
+  }
+}
+
 /**
  * Get the path from a full URL
  */
@@ -142,6 +192,7 @@ export async function getPublicUrl(path: string): Promise<string> {
  * Create a new product in the database
  */
 export async function createProduct(productData: {
+  id?: string;
   name: string;
   description: string;
   price?: number;
@@ -156,6 +207,7 @@ export async function createProduct(productData: {
   buying_price?: number;
   selling_price?: number;
   items_sold?: number;
+  store?: string;
 }): Promise<{ success: boolean; error?: string; id?: string }> {
   try {
     const supabase = await createClient();
@@ -314,10 +366,10 @@ export async function deleteProduct(
   try {
     const supabase = await createClient();
 
-    // First, fetch the product to get its images
+    // First, fetch the product to get its condition
     const { data: product, error: fetchError } = await supabase
       .from("handbags")
-      .select("images")
+      .select("condition")
       .eq("id", id)
       .single();
 
@@ -337,18 +389,11 @@ export async function deleteProduct(
       return { success: false, error: deleteError.message };
     }
 
-    // Delete associated images from storage
-    if (product?.images && Array.isArray(product.images) && product.images.length > 0) {
-      const imagePaths = await Promise.all(
-        product.images.map((imageUrl: string) => getPathFromUrl(imageUrl))
-      );
-
-      const { error: storageError } = await supabase.storage
-        .from(BUCKET_NAME)
-        .remove(imagePaths);
-
-      if (storageError) {
-        console.error("Error deleting images from storage:", storageError);
+    // Delete associated images from storage using the product ID and condition
+    if (product?.condition) {
+      const deletedImages = await deleteProductImages(product.condition, id);
+      if (!deletedImages) {
+        console.warn(`Warning: Failed to delete images for product ${id}`);
         // Don't fail the whole operation if image deletion fails
         // The product is already deleted from the database
       }

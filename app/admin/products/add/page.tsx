@@ -6,6 +6,7 @@ import { uploadMultipleImages, createProduct, updateProduct, fetchProductById } 
 import ProductForm, { ProductFormData } from "@/components/Admin/ProductForm";
 import { IMAGE_UPLOAD_CONFIG } from "@/lib/constants";
 import { calculateSellingPrice } from "@/lib/pricing";
+import { v4 as uuidv4 } from "uuid";
 
 function AddProductContent() {
   const router = useRouter();
@@ -169,42 +170,79 @@ function AddProductContent() {
         throw new Error("Selling price must be greater than 0");
       }
 
-      // Upload new images if any
-      let newImageUrls: string[] = [];
-      if (imageFiles.length > 0) {
-        setUploadingImages(true);
-        newImageUrls = await uploadMultipleImages(imageFiles, formData.condition);
-        setUploadingImages(false);
-
-        if (newImageUrls.length === 0) {
-          throw new Error("Failed to upload images");
-        }
-      }
-
-      // Combine existing and new images
-      const allImages = [...existingImages, ...newImageUrls];
-
-      const productData = {
-        name: formData.name,
-        description: formData.description,
-        condition: formData.condition,
-        brand: formData.brand,
-        material: formData.material,
-        images: allImages,
-        stock_status: formData.stock_status,
-        dimensions: formData.dimensions,
-        number_of_colors_available: formData.number_of_colors_available ? parseInt(formData.number_of_colors_available) : 1,
-        buying_price: formData.buying_price ? parseInt(formData.buying_price) : undefined,
-        selling_price: parseInt(formData.selling_price),
-        items_sold: formData.items_sold ? parseInt(formData.items_sold) : 0,
-        store: formData.store || undefined,
-      };
-
       let result;
+      let productId: string;
+
       if (isEditMode && editId) {
+        // For edit mode, use the existing product ID
+        productId = editId;
+
+        // Upload new images if any
+        let newImageUrls: string[] = [];
+        if (imageFiles.length > 0) {
+          setUploadingImages(true);
+          newImageUrls = await uploadMultipleImages(imageFiles, formData.condition, productId);
+          setUploadingImages(false);
+
+          if (newImageUrls.length === 0) {
+            throw new Error("Failed to upload images");
+          }
+        }
+
+        // Combine existing and new images
+        const allImages = [...existingImages, ...newImageUrls];
+
+        const productData = {
+          name: formData.name,
+          description: formData.description,
+          condition: formData.condition,
+          brand: formData.brand,
+          material: formData.material,
+          images: allImages,
+          stock_status: formData.stock_status,
+          dimensions: formData.dimensions,
+          number_of_colors_available: formData.number_of_colors_available ? parseInt(formData.number_of_colors_available) : 1,
+          buying_price: formData.buying_price ? parseInt(formData.buying_price) : undefined,
+          selling_price: parseInt(formData.selling_price),
+          items_sold: formData.items_sold ? parseInt(formData.items_sold) : 0,
+          store: formData.store || undefined,
+        };
+
         // Update existing product
-        result = await updateProduct(editId, productData);
+        result = await updateProduct(productId, productData);
       } else {
+        // For new products, generate a UUID first
+        productId = uuidv4();
+
+        // Upload images with the generated product ID
+        let imageUrls: string[] = [];
+        if (imageFiles.length > 0) {
+          setUploadingImages(true);
+          imageUrls = await uploadMultipleImages(imageFiles, formData.condition, productId);
+          setUploadingImages(false);
+
+          if (imageUrls.length === 0) {
+            throw new Error("Failed to upload images");
+          }
+        }
+
+        const productData = {
+          id: productId,
+          name: formData.name,
+          description: formData.description,
+          condition: formData.condition,
+          brand: formData.brand,
+          material: formData.material,
+          images: imageUrls,
+          stock_status: formData.stock_status,
+          dimensions: formData.dimensions,
+          number_of_colors_available: formData.number_of_colors_available ? parseInt(formData.number_of_colors_available) : 1,
+          buying_price: formData.buying_price ? parseInt(formData.buying_price) : undefined,
+          selling_price: parseInt(formData.selling_price),
+          items_sold: formData.items_sold ? parseInt(formData.items_sold) : 0,
+          store: formData.store || undefined,
+        };
+
         // Create new product
         result = await createProduct(productData);
       }
