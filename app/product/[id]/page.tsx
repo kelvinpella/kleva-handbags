@@ -2,6 +2,7 @@ import { getHandbagById, getSimilarHandbags } from '@/lib/supabase';
 import ProductGallery from '@/components/ProductGallery';
 import WhatsAppButton from '@/components/WhatsappButton';
 import ProductCard from '@/components/ProductCard';
+import PricingSection from '@/components/PricingSection';
 import { notFound } from 'next/navigation';
 import { Handbag } from '@/typings';
 import Link from 'next/link';
@@ -92,12 +93,12 @@ export default async function ProductPage({ params }: PageProps) {
               </h1>
             </div>
 
-            {/* Price */}
-            <div className="flex items-baseline space-x-3">
-              <span className="text-3xl font-bold text-red-600">
-                TSh {handbag.selling_price.toLocaleString('en-US')}
-              </span>
-            </div>
+            {/* Pricing */}
+            <PricingSection
+              retailPrice={27000}
+              wholesalePriceTZS={24000}
+              wholesalePriceUSD={10.00}
+            />
 
             {/* Stock Status */}
             {handbag.stock_status === 'out_of_stock' && (
@@ -106,23 +107,12 @@ export default async function ProductPage({ params }: PageProps) {
               </div>
             )}
 
-            {/* Description */}
-            <div className="border-t border-neutral-200 pt-6">
-              <p className="text-neutral-700 text-sm leading-relaxed">
-                {handbag.description}
-              </p>
-            </div>
-
             {/* Product Details */}
             <div className="border-t border-neutral-200 pt-6 space-y-3">
               <h3 className="font-bold text-neutral-900 text-sm uppercase tracking-wide">
                 Product Details
               </h3>
               <dl className="space-y-2 text-sm">
-                <div className="flex justify-between py-2 border-b border-neutral-100">
-                  <dt className="text-neutral-600">Brand</dt>
-                  <dd className="font-medium text-neutral-900">{handbag.brand}</dd>
-                </div>
                 <div className="flex justify-between py-2 border-b border-neutral-100">
                   <dt className="text-neutral-600">Material</dt>
                   <dd className="font-medium text-neutral-900">{handbag.material}</dd>
@@ -139,12 +129,6 @@ export default async function ProductPage({ params }: PageProps) {
                     {CONDITION_LABELS[handbag.condition as keyof typeof CONDITION_LABELS]}
                   </dd>
                 </div>
-                {handbag.number_of_colors_available && handbag.number_of_colors_available > 1 && (
-                  <div className="flex justify-between py-2 border-b border-neutral-100">
-                    <dt className="text-neutral-600">Available Colors</dt>
-                    <dd className="font-medium text-neutral-900">{handbag.number_of_colors_available}</dd>
-                  </div>
-                )}
               </dl>
             </div>
 
