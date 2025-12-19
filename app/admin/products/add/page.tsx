@@ -5,7 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { uploadMultipleImages, createProduct, updateProduct, fetchProductById } from "@/lib/actions";
 import ProductForm, { ProductFormData } from "@/components/Admin/ProductForm";
 import { IMAGE_UPLOAD_CONFIG } from "@/lib/constants";
-import { calculateSellingPrice } from "@/lib/pricing";
+import { calculateRetailPrice, calculateWholesalePriceTZS, calculateWholesalePriceUSD } from "@/lib/pricing";
+import { fetchExchangeRate } from "@/lib/exchangeRate";
 import { v4 as uuidv4 } from "uuid";
 
 function AddProductContent() {
@@ -18,6 +19,8 @@ function AddProductContent() {
   const [initialLoading, setInitialLoading] = useState(isEditMode);
   const [uploadingImages, setUploadingImages] = useState(false);
   const [error, setError] = useState("");
+  const [exchangeRate, setExchangeRate] = useState<number>(0); // No default rate
+  const [exchangeRateError, setExchangeRateError] = useState(false);
 
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
@@ -28,13 +31,36 @@ function AddProductContent() {
     stock_status: "in_stock",
     dimensions: "",
     buying_price: "",
-    selling_price: "",
+    retail_price: "",
+    wholesale_price_tzs: "",
+    wholesale_price_usd: "",
     store: "",
   });
 
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreview, setImagePreviews] = useState<string[]>([]);
+
+  // Fetch exchange rate on component mount
+  useEffect(() => {
+    async function loadExchangeRate() {
+      try {
+        const rate = await fetchExchangeRate();
+        if (rate > 0) {
+          setExchangeRate(rate);
+          setExchangeRateError(false);
+        } else {
+          setExchangeRateError(true);
+          setError("Failed to fetch exchange rate. Please check your internet connection and try again.");
+        }
+      } catch (err) {
+        console.error("Failed to fetch exchange rate:", err);
+        setExchangeRateError(true);
+        setError("Failed to fetch exchange rate. Please check your internet connection and try again.");
+      }
+    }
+    loadExchangeRate();
+  }, []);
 
   // Fetch product data if in edit mode
   useEffect(() => {
@@ -52,14 +78,16 @@ function AddProductContent() {
         const data = result.data;
         setFormData({
           name: data.name,
-          price: data.price?.toString() || data.selling_price?.toString() || "",
+          price: data.retail_price?.toString() || "",
           condition: data.condition,
           brand: data.brand,
           material: data.material,
           stock_status: data.stock_status,
           dimensions: data.dimensions || "",
           buying_price: data.buying_price?.toString() || "",
-          selling_price: data.selling_price?.toString() || data.price?.toString() || "",
+          retail_price: data.retail_price?.toString() || "",
+          wholesale_price_tzs: data.wholesale_price_tzs?.toString() || "",
+          wholesale_price_usd: data.wholesale_price_usd?.toString() || "",
           store: data.store || "",
         });
         setExistingImages(data.images || []);
@@ -81,7 +109,7 @@ function AddProductContent() {
   ) => {
     const { name, value } = e.target;
 
-    // If buying price changes, automatically calculate selling price
+    // If buying price changes, automatically calculate all prices
     if (name === "buying_price") {
       const buyingPrice = parseFloat(value) || 0;
 
@@ -96,11 +124,22 @@ function AddProductContent() {
         setError("");
       }
 
-      const sellingPrice = calculateSellingPrice(buyingPrice);
+      const retailPrice = calculateRetailPrice(buyingPrice);
+      const wholesalePriceTZS = calculateWholesalePriceTZS(buyingPrice);
+      const wholesalePriceUSD = calculateWholesalePriceUSD(buyingPrice, exchangeRate);
+
+      // Show warning if exchange rate is not available
+      if (exchangeRate <= 0 && !exchangeRateError) {
+        setExchangeRateError(true);
+        setError("Exchange rate unavailable. USD wholesale price cannot be calculated.");
+      }
+
       setFormData((prev) => ({
         ...prev,
         buying_price: value,
-        selling_price: sellingPrice > 0 ? sellingPrice.toString() : ""
+        retail_price: retailPrice > 0 ? retailPrice.toString() : "",
+        wholesale_price_tzs: wholesalePriceTZS > 0 ? wholesalePriceTZS.toString() : "",
+        wholesale_price_usd: wholesalePriceUSD > 0 ? wholesalePriceUSD.toString() : ""
       }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
@@ -148,7 +187,7 @@ function AddProductContent() {
         throw new Error("Please upload at least one image");
       }
 
-      if (!formData.name || !formData.selling_price) {
+      if (!formData.name || !formData.retail_price) {
         throw new Error("Please fill in all required fields");
       }
 
@@ -158,10 +197,18 @@ function AddProductContent() {
         throw new Error("Buying price must be greater than 0");
       }
 
-      // Validate selling price
-      const sellingPrice = parseFloat(formData.selling_price);
-      if (sellingPrice <= 0) {
-        throw new Error("Selling price must be greater than 0");
+      // Validate all prices
+      const retailPrice = parseFloat(formData.retail_price);
+      const wholesalePriceTZS = parseFloat(formData.wholesale_price_tzs || "0");
+      const wholesalePriceUSD = parseFloat(formData.wholesale_price_usd || "0");
+
+      if (retailPrice <= 0 || wholesalePriceTZS <= 0) {
+        throw new Error("Retail and wholesale prices (TZS) must be greater than 0");
+      }
+
+      // Check if exchange rate is available for USD price
+      if (exchangeRate <= 0 || wholesalePriceUSD <= 0) {
+        throw new Error("Exchange rate unavailable. Cannot calculate USD wholesale price. Please refresh the page and try again.");
       }
 
       let result;
@@ -195,7 +242,9 @@ function AddProductContent() {
           stock_status: formData.stock_status,
           dimensions: formData.dimensions,
           buying_price: formData.buying_price ? parseInt(formData.buying_price) : undefined,
-          selling_price: parseInt(formData.selling_price),
+          retail_price: parseInt(formData.retail_price),
+          wholesale_price_tzs: parseInt(formData.wholesale_price_tzs || "0"),
+          wholesale_price_usd: parseInt(formData.wholesale_price_usd || "0"),
           store: formData.store || undefined,
         };
 
@@ -227,7 +276,9 @@ function AddProductContent() {
           stock_status: formData.stock_status,
           dimensions: formData.dimensions,
           buying_price: formData.buying_price ? parseInt(formData.buying_price) : undefined,
-          selling_price: parseInt(formData.selling_price),
+          retail_price: parseInt(formData.retail_price),
+          wholesale_price_tzs: parseInt(formData.wholesale_price_tzs || "0"),
+          wholesale_price_usd: parseInt(formData.wholesale_price_usd || "0"),
           store: formData.store || undefined,
         };
 
@@ -276,6 +327,7 @@ function AddProductContent() {
         uploadingImages={uploadingImages}
         loading={loading}
         error={error}
+        exchangeRate={exchangeRate}
         onSubmit={handleSubmit}
         onInputChange={handleInputChange}
         onImageChange={handleImageChange}

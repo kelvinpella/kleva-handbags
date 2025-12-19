@@ -203,7 +203,9 @@ export async function createProduct(productData: {
   stock_status: string;
   dimensions?: string;
   buying_price?: number;
-  selling_price?: number;
+  retail_price?: number;
+  wholesale_price_tzs?: number;
+  wholesale_price_usd?: number;
   store?: string;
 }): Promise<{ success: boolean; error?: string; id?: string }> {
   try {
@@ -325,7 +327,9 @@ export async function updateProduct(
     stock_status: string;
     dimensions?: string;
     buying_price?: number;
-    selling_price?: number;
+    retail_price?: number;
+    wholesale_price_tzs?: number;
+    wholesale_price_usd?: number;
   }
 ): Promise<{ success: boolean; error?: string }> {
   try {

@@ -48,9 +48,9 @@ export default function ProductCard({ handbag }: ProductCardProps) {
           {/* Pricing Section */}
           <div className="pb-3">
             <PricingSection
-              retailPrice={27000}
-              wholesalePriceTZS={24000}
-              wholesalePriceUSD={10.0}
+              retailPrice={handbag.retail_price}
+              wholesalePriceTZS={handbag.wholesale_price_tzs}
+              wholesalePriceUSD={handbag.wholesale_price_usd}
             />
           </div>{" "}
         </div>

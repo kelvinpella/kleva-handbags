@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import { IMAGE_UPLOAD_CONFIG } from '@/lib/constants';
-import { getProfitPercentage } from '@/lib/pricing';
 
 export interface ProductFormData {
   name: string;
@@ -13,7 +12,9 @@ export interface ProductFormData {
   stock_status: 'in_stock' | 'out_of_stock';
   dimensions?: string;
   buying_price?: string;
-  selling_price?: string;
+  retail_price?: string;
+  wholesale_price_tzs?: string;
+  wholesale_price_usd?: string;
   store?: string;
 }
 
@@ -24,6 +25,7 @@ interface ProductFormProps {
   uploadingImages?: boolean;
   loading?: boolean;
   error?: string;
+  exchangeRate?: number;
   onSubmit: (e: React.FormEvent) => void;
   onInputChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -44,6 +46,7 @@ export default function ProductForm({
   uploadingImages = false,
   loading = false,
   error = '',
+  exchangeRate = 2400,
   onSubmit,
   onInputChange,
   onImageChange,
@@ -286,36 +289,86 @@ export default function ProductForm({
             placeholder="e.g., 50000"
           />
           <p className="mt-1 text-xs text-neutral-500">
-            Enter a positive value to auto-calculate selling price
+            Enter buying price to auto-calculate all prices
           </p>
         </div>
 
-        {/* Selling Price */}
+        {/* Retail Price */}
         <div>
-          <label htmlFor="selling_price" className="block text-sm font-medium text-neutral-900 mb-2">
-            Selling Price (TSh) <span className="text-red-600">*</span>
-            {initialData?.buying_price && (
-              <span className="ml-2 text-xs font-normal text-green-600">
-                (+{Math.round(getProfitPercentage(parseFloat(initialData.buying_price)) * 100)}% profit)
-              </span>
-            )}
+          <label htmlFor="retail_price" className="block text-sm font-medium text-neutral-900 mb-2">
+            Retail Price (TSh) <span className="text-red-600">*</span>
           </label>
           <input
             type="number"
-            id="selling_price"
-            name="selling_price"
+            id="retail_price"
+            name="retail_price"
             required
             step="1"
             min="1"
-            value={initialData?.selling_price || initialData?.price || ''}
+            value={initialData?.retail_price || ''}
             onChange={onInputChange}
             className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent bg-neutral-50"
-            placeholder="Auto-calculated from buying price"
+            placeholder="Auto-calculated (Buying Price + 12,000)"
             readOnly
           />
           <p className="mt-1 text-xs text-neutral-500">
-            Automatically calculated with profit percentage and rounded to nearest thousand
+            Buying Price + TSh 12,000
           </p>
+        </div>
+
+        {/* Wholesale Price TZS */}
+        <div>
+          <label htmlFor="wholesale_price_tzs" className="block text-sm font-medium text-neutral-900 mb-2">
+            Wholesale Price (TSh) <span className="text-red-600">*</span>
+          </label>
+          <input
+            type="number"
+            id="wholesale_price_tzs"
+            name="wholesale_price_tzs"
+            required
+            step="1"
+            min="1"
+            value={initialData?.wholesale_price_tzs || ''}
+            onChange={onInputChange}
+            className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent bg-neutral-50"
+            placeholder="Auto-calculated (Buying Price + 7,000)"
+            readOnly
+          />
+          <p className="mt-1 text-xs text-neutral-500">
+            Buying Price + TSh 7,000
+          </p>
+        </div>
+
+        {/* Wholesale Price USD */}
+        <div>
+          <label htmlFor="wholesale_price_usd" className="block text-sm font-medium text-neutral-900 mb-2">
+            Wholesale Price (USD) <span className="text-red-600">*</span>
+          </label>
+          <input
+            type="number"
+            id="wholesale_price_usd"
+            name="wholesale_price_usd"
+            required
+            step="1"
+            min="1"
+            value={initialData?.wholesale_price_usd || ''}
+            onChange={onInputChange}
+            className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent bg-neutral-50"
+            placeholder="Auto-calculated"
+            readOnly
+          />
+          <p className="mt-1 text-xs text-neutral-500">
+            (Buying Price + TSh 9,000) / {exchangeRate > 0 ? exchangeRate.toLocaleString() : 'N/A'}, rounded up
+          </p>
+          {exchangeRate > 0 ? (
+            <p className="mt-1 text-xs text-green-600 font-medium">
+              Current rate: 1 USD = {exchangeRate.toLocaleString()} TZS
+            </p>
+          ) : (
+            <p className="mt-1 text-xs text-red-600 font-medium">
+              Exchange rate unavailable. Cannot calculate USD price.
+            </p>
+          )}
         </div>
 
         {/* Stock Status */}

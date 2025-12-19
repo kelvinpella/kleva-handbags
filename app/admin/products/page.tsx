@@ -204,7 +204,7 @@ export default async function ProductsListPage({
                         {product.brand}
                       </td>
                       <td className="px-6 py-4 text-sm font-medium text-neutral-900">
-                        {product.selling_price.toLocaleString()}
+                        {product.retail_price.toLocaleString()}
                       </td>
                       <td className="px-6 py-4">
                         <span

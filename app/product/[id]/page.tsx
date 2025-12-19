@@ -94,9 +94,9 @@ export default async function ProductPage({ params }: PageProps) {
 
             {/* Pricing */}
             <PricingSection
-              retailPrice={27000}
-              wholesalePriceTZS={24000}
-              wholesalePriceUSD={10.00}
+              retailPrice={handbag.retail_price}
+              wholesalePriceTZS={handbag.wholesale_price_tzs}
+              wholesalePriceUSD={handbag.wholesale_price_usd}
             />
 
             {/* Stock Status */}
@@ -137,7 +137,7 @@ export default async function ProductPage({ params }: PageProps) {
                 <WhatsAppButton
                   phoneNumber={whatsappNumber}
                   productName={handbag.name}
-                  productPrice={handbag.selling_price}
+                  productPrice={handbag.retail_price}
                   productUrl={productUrl}
                 />
                 <p className="text-xs italic text-center mt-3">

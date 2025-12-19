@@ -16,7 +16,7 @@ export default function PricingSection({
         <p className="text-sm uppercase font-medium">
           Retail <span className="italic text-xs capitalize">( Rejareja )</span>
         </p>
-        <p className="text-sm font-bold text-red-600 pl-4">
+        <p className="text-base font-bold text-red-600 pl-4">
           TSh. {retailPrice.toLocaleString('en-US')}
         </p>
       </div>
@@ -27,11 +27,11 @@ export default function PricingSection({
           Wholesale <span className="italic text-xs capitalize">( Jumla )</span>
         </p>
         <div className="space-y-0.5 pl-4">
-          <p className="text-sm font-bold text-red-600">
+          <p className="text-base font-bold text-red-600">
             TSh. {wholesalePriceTZS.toLocaleString('en-US')}
           </p>
-          <p className="text-sm font-bold text-red-600">
-            USD {wholesalePriceUSD.toFixed(2)}
+          <p className="text-base font-bold text-red-600">
+            USD ${wholesalePriceUSD}
           </p>
         </div>
       </div>

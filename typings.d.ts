@@ -8,7 +8,9 @@ export interface Handbag {
     created_at: string;
     stock_status: 'in_stock' | 'out_of_stock';
     buying_price: number;
-    selling_price: number;
+    retail_price: number;
+    wholesale_price_tzs: number;
+    wholesale_price_usd: number;
     dimensions?: string;
     store?: string;
   }
