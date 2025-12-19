@@ -26,7 +26,6 @@ export async function generateMetadata({ params }: PageProps) {
 
   return {
     title: `${handbag.name} - Kleva Handbags`,
-    description: handbag.description,
   };
 }
 

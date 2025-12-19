@@ -194,7 +194,6 @@ export async function getPublicUrl(path: string): Promise<string> {
 export async function createProduct(productData: {
   id?: string;
   name: string;
-  description: string;
   price?: number;
   condition: string;
   brand: string;
@@ -203,10 +202,8 @@ export async function createProduct(productData: {
   whatsapp_number?: string;
   stock_status: string;
   dimensions?: string;
-  number_of_colors_available?: number;
   buying_price?: number;
   selling_price?: number;
-  items_sold?: number;
   store?: string;
 }): Promise<{ success: boolean; error?: string; id?: string }> {
   try {
@@ -321,17 +318,14 @@ export async function updateProduct(
   id: string,
   productData: {
     name: string;
-    description: string;
     condition: string;
     brand: string;
     material: string;
     images: string[];
     stock_status: string;
     dimensions?: string;
-    number_of_colors_available?: number;
     buying_price?: number;
     selling_price?: number;
-    items_sold?: number;
   }
 ): Promise<{ success: boolean; error?: string }> {
   try {
@@ -448,39 +442,10 @@ export async function getDashboardStats() {
       throw secondHandError;
     }
 
-    // Calculate profits from sales table
-    const { data: allSales, error: salesError } = await supabase
-      .from("sales")
-      .select("profit, product_condition");
-
-    if (salesError) {
-      console.error("Error fetching sales for profit calculation:", salesError);
-      throw salesError;
-    }
-
-    // Calculate total profit and profit by condition
-    let totalProfit = 0;
-    let newHandbagsProfit = 0;
-    let secondHandProfit = 0;
-
-    allSales?.forEach((sale) => {
-      const profit = sale.profit || 0;
-      totalProfit += profit;
-
-      if (sale.product_condition === "new") {
-        newHandbagsProfit += profit;
-      } else if (sale.product_condition === "second-hand") {
-        secondHandProfit += profit;
-      }
-    });
-
     return {
       totalProducts: totalProducts || 0,
       newProducts: newProducts || 0,
       secondHandProducts: secondHandProducts || 0,
-      totalProfit,
-      newHandbagsProfit,
-      secondHandProfit,
     };
   } catch (error: any) {
     console.error("Dashboard stats error:", error);

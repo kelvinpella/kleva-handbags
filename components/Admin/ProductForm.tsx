@@ -6,17 +6,14 @@ import { getProfitPercentage } from '@/lib/pricing';
 
 export interface ProductFormData {
   name: string;
-  description: string;
   price: string;
   condition: 'new' | 'second-hand';
   brand: string;
   material: string;
   stock_status: 'in_stock' | 'out_of_stock';
   dimensions?: string;
-  number_of_colors_available?: string;
   buying_price?: string;
   selling_price?: string;
-  items_sold?: string;
   store?: string;
 }
 
@@ -269,23 +266,6 @@ export default function ProductForm({
         </div>
       </div>
 
-      {/* Description */}
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium text-neutral-900 mb-2">
-          Description <span className="text-red-600">*</span>
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          required
-          value={initialData?.description || ''}
-          onChange={onInputChange}
-          rows={4}
-          className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-          placeholder="Detailed product description..."
-        />
-      </div>
-
       {/* Pricing and Inventory */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Buying Price */}
@@ -338,23 +318,6 @@ export default function ProductForm({
           </p>
         </div>
 
-        {/* Number of Colors Available */}
-        <div>
-          <label htmlFor="number_of_colors_available" className="block text-sm font-medium text-neutral-900 mb-2">
-            Number of Colors Available
-          </label>
-          <input
-            type="number"
-            id="number_of_colors_available"
-            name="number_of_colors_available"
-            min="1"
-            value={initialData?.number_of_colors_available || ''}
-            onChange={onInputChange}
-            className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-            placeholder="e.g., 3"
-          />
-        </div>
-
         {/* Stock Status */}
         <div>
           <label htmlFor="stock_status" className="block text-sm font-medium text-neutral-900 mb-2">
@@ -370,23 +333,6 @@ export default function ProductForm({
             <option value="in_stock">In Stock</option>
             <option value="out_of_stock">Out of Stock</option>
           </select>
-        </div>
-
-        {/* Items Sold */}
-        <div>
-          <label htmlFor="items_sold" className="block text-sm font-medium text-neutral-900 mb-2">
-            Items Sold
-          </label>
-          <input
-            type="number"
-            id="items_sold"
-            name="items_sold"
-            min="0"
-            value={initialData?.items_sold || ''}
-            onChange={onInputChange}
-            className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent"
-            placeholder="e.g., 5"
-          />
         </div>
       </div>
 

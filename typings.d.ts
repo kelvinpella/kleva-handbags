@@ -1,7 +1,6 @@
 export interface Handbag {
     id: string;
     name: string;
-    description: string;
     condition: 'new' | 'second-hand';
     brand: string;
     material: string;
@@ -11,8 +10,6 @@ export interface Handbag {
     buying_price: number;
     selling_price: number;
     dimensions?: string;
-    number_of_colors_available?: number;
-    items_sold?: number;
     store?: string;
   }
   
