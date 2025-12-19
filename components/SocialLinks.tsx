@@ -11,14 +11,14 @@ const links = [
     label: "WhatsApp",
     href: `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}`,
   },
-  {
-    label: "TikTok",
-    href: "https://www.tiktok.com/@pochi_kali_kariakoo",
-  },
-  {
-    label: "Instagram",
-    href: "https://www.instagram.com/klevahandbags",
-  },
+  // {
+  //   label: "TikTok",
+  //   href: "https://www.tiktok.com/@pochi_kali_kariakoo",
+  // },
+  // {
+  //   label: "Instagram",
+  //   href: "https://www.instagram.com/klevahandbags",
+  // },
 ];
 
 export default function SocialLinks({
@@ -75,4 +75,3 @@ function WhatsAppIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-
