@@ -355,7 +355,6 @@ export default function ProductForm({
             onChange={onInputChange}
             className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent bg-neutral-50"
             placeholder="Auto-calculated"
-            readOnly
           />
           <p className="mt-1 text-xs text-neutral-500">
             (Buying Price + TSh 9,000) / {exchangeRate > 0 ? exchangeRate.toLocaleString() : 'N/A'}, rounded up
