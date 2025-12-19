@@ -30,6 +30,30 @@ export default function RootLayout({
             />
           </div>
         </div>
+        <div className="max-w-full lg:max-w-xl lg:mx-auto bg-yellow-50 my-4 border border-yellow-200">
+          <div className="px-4 py-3">
+            <div className="flex items-start gap-3">
+              <svg
+                className="h-6 w-6 text-yellow-600 shrink-0"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8.257 3.099c.765-1.36 2.72-1.36 3.485 0l6.518 11.59c.75 1.333-.213 2.983-1.742 2.983H3.48c-1.53 0-2.492-1.65-1.742-2.983L8.257 3.1zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-2a1 1 0 01-1-1V7a1 1 0 112 0v3a1 1 0 01-1 1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <p className="px-2 text-sm text-yellow-900">
+                This catalog does not reflect our current inventory; Please
+                contact us on WhatsApp to get our latest handbags.<br/><br/>
+                <span className="italic">Katalogi hii haikisi mali iliyopo kwa sasa. Tafadhali wasiliana nasi whatsapp ili kupata pochi zetu zilizopo</span>
+              </p>
+            </div>
+          </div>
+        </div>
         <main className="min-h-screen bg-white">{children}</main>
         <Footer />
       </body>

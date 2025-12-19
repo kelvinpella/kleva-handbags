@@ -1,57 +1,44 @@
 /**
- * Profit percentage table by buying price ranges (in TSh)
- */
-const PROFIT_RANGES = [
-  { min: 0, max: 19999, percentage: 1.00 },
-  { min: 20000, max: 24999, percentage: 0.90 },
-  { min: 25000, max: 30999, percentage: 0.85 },
-  { min: 31000, max: 34999, percentage: 0.80 },
-  { min: 35000, max: 40999, percentage: 0.75 },
-  { min: 41000, max: 44999, percentage: 0.70 },
-  { min: 45000, max: 50999, percentage: 0.65 },
-  { min: 51000, max: 54999, percentage: 0.60 },
-  { min: 55000, max: 60999, percentage: 0.55 },
-  { min: 61000, max: 64999, percentage: 0.50 },
-  { min: 65000, max: 70999, percentage: 0.45 },
-  { min: 71000, max: 74999, percentage: 0.42 },
-  { min: 75000, max: 80999, percentage: 0.38 },
-  { min: 81000, max: 84999, percentage: 0.35 },
-  { min: 85000, max: 90999, percentage: 0.33 },
-  { min: 91000, max: Infinity, percentage: 0.30 },
-];
-
-/**
- * Get the profit percentage for a given buying price
+ * Calculate the retail price based on the buying price
+ * Retail price = Buying price + TSh 12,000
  * @param buyingPrice - The buying price in TSh
- * @returns The profit percentage as a decimal (e.g., 0.90 for 90%)
+ * @returns The retail price
  */
-export function getProfitPercentage(buyingPrice: number): number {
-  const range = PROFIT_RANGES.find(
-    (r) => buyingPrice >= r.min && buyingPrice <= r.max
-  );
-  return range?.percentage || 0.30; // Default to 30% if no range matches
-}
-
-/**
- * Round a number up to the nearest thousand
- * @param value - The value to round
- * @returns The value rounded up to the nearest thousand
- */
-export function roundToNearestThousand(value: number): number {
-  return Math.ceil(value / 1000) * 1000;
-}
-
-/**
- * Calculate the selling price based on the buying price
- * @param buyingPrice - The buying price in TSh
- * @returns The selling price rounded to the nearest thousand
- */
-export function calculateSellingPrice(buyingPrice: number): number {
+export function calculateRetailPrice(buyingPrice: number): number {
   if (!buyingPrice || buyingPrice <= 0) {
     return 0;
   }
+  return buyingPrice + 12000;
+}
 
-  const profitPercentage = getProfitPercentage(buyingPrice);
-  const sellingPrice = buyingPrice + buyingPrice * profitPercentage;
-  return roundToNearestThousand(sellingPrice);
+/**
+ * Calculate the wholesale price in TZS based on the buying price
+ * Wholesale price (TZS) = Buying price + TSh 7,000
+ * @param buyingPrice - The buying price in TSh
+ * @returns The wholesale price in TZS
+ */
+export function calculateWholesalePriceTZS(buyingPrice: number): number {
+  if (!buyingPrice || buyingPrice <= 0) {
+    return 0;
+  }
+  return buyingPrice + 7000;
+}
+
+/**
+ * Calculate the wholesale price in USD based on the buying price
+ * Wholesale price (USD) = (Buying price + TSh 9,000) / Exchange rate, rounded up to nearest whole number
+ * @param buyingPrice - The buying price in TSh
+ * @param exchangeRate - The current TZS to USD exchange rate (required)
+ * @returns The wholesale price in USD (whole number), or 0 if exchange rate is unavailable
+ */
+export function calculateWholesalePriceUSD(buyingPrice: number, exchangeRate?: number): number {
+  if (!buyingPrice || buyingPrice <= 0) {
+    return 0;
+  }
+  if (!exchangeRate || exchangeRate <= 0) {
+    return 0; // Cannot calculate without valid exchange rate
+  }
+  const priceInTZS = buyingPrice + 9000;
+  const priceInUSD = priceInTZS / exchangeRate;
+  return Math.ceil(priceInUSD); // Round up to nearest whole number
 }
