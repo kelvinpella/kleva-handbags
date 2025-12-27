@@ -308,11 +308,11 @@ export default function ProductForm({
             value={initialData?.retail_price || ''}
             onChange={onInputChange}
             className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent bg-neutral-50"
-            placeholder="Auto-calculated (Buying Price + 12,000)"
+            placeholder="Auto-calculated (Buying Price + 10,000)"
             readOnly
           />
           <p className="mt-1 text-xs text-neutral-500">
-            Buying Price + TSh 12,000
+            Buying Price + TSh 10,000
           </p>
         </div>
 
@@ -331,11 +331,11 @@ export default function ProductForm({
             value={initialData?.wholesale_price_tzs || ''}
             onChange={onInputChange}
             className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent bg-neutral-50"
-            placeholder="Auto-calculated (Buying Price + 7,000)"
+            placeholder="Auto-calculated (Buying Price + 3,000)"
             readOnly
           />
           <p className="mt-1 text-xs text-neutral-500">
-            Buying Price + TSh 7,000
+            Buying Price + TSh 3,000
           </p>
         </div>
 
@@ -357,7 +357,7 @@ export default function ProductForm({
             placeholder="Auto-calculated"
           />
           <p className="mt-1 text-xs text-neutral-500">
-            (Buying Price + TSh 9,000) / {exchangeRate > 0 ? exchangeRate.toLocaleString() : 'N/A'}, rounded up
+            (Wholesale Price TZS + TSh 2,000) / {exchangeRate > 0 ? exchangeRate.toLocaleString() : 'N/A'}, rounded up
           </p>
           {exchangeRate > 0 ? (
             <p className="mt-1 text-xs text-green-600 font-medium">
