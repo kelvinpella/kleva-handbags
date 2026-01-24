@@ -11,10 +11,10 @@ const links = [
     label: "WhatsApp",
     href: `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}`,
   },
-  // {
-  //   label: "TikTok",
-  //   href: "https://www.tiktok.com/@pochi_kali_kariakoo",
-  // },
+  {
+    label: "TikTok",
+    href: "https://www.tiktok.com/@pochi_kali_kariakoo",
+  },
   // {
   //   label: "Instagram",
   //   href: "https://www.instagram.com/klevahandbags",
