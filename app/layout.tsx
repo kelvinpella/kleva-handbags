@@ -10,6 +10,9 @@ const montserrat = Montserrat({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Kleva Handbags - New and Second-Hand Handbags",
   description: "Buy new and second-hand handbags at affordable prices",
+  other: {
+    'tiktok-developers-site-verification': 'eZnSmwsSipSuKDQUmD3cuc4eYrrt9iBx',
+  },
 };
 
 export default function RootLayout({
