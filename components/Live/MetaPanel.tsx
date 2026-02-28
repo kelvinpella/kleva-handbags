@@ -8,7 +8,7 @@ function formatPrice(v: number | string) {
   if (v === null || v === undefined) return "";
   const n = typeof v === "string" ? Number(v) : v;
   if (!Number.isFinite(n)) return String(v);
-  return `Tsh ${n.toLocaleString("en-US")}`;
+  return `${n.toLocaleString("en-US")}`;
 }
 
 export default function MetaPanel({
@@ -55,7 +55,7 @@ export default function MetaPanel({
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           exit={{ opacity: 0, y: -8, filter: "blur(6px)" }}
           transition={{ duration: 0.55, ease: "easeOut" }}
-          className="h-full rounded-xl border border-neutral-800 bg-gradient-to-b from-neutral-900/40 to-neutral-950/40 p-3 relative overflow-hidden"
+          className="h-full rounded-xl border border-neutral-800 bg-linear-to-b from-neutral-900/40 to-neutral-950/40 p-3 relative overflow-hidden"
         >
           {/* shimmer */}
           <motion.div
@@ -79,28 +79,13 @@ export default function MetaPanel({
               {formatPrice(handbag.retail_price)}
             </div>
 
-            <div className="mt-3 space-y-2 text-[12px] text-neutral-300">
-              <div className="flex items-center gap-2">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-200/90" />
-                <span>Pochi kali ya Kariakoo vibe</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-200/90" />
-                <span>Comment namba kuona inayofuata</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-200/90" />
-                <span>Comment “POCHI” kwa free photoshop</span>
-              </div>
-            </div>
-
             <div className="mt-auto">
               <div className="rounded-lg border border-amber-200/20 bg-black/30 p-2 text-center">
                 <div className="text-[12px] text-neutral-200 font-semibold">
-                  COMMENT A NUMBER
+                  TIZAMA ZAIDI
                 </div>
                 <div className="text-[16px] font-bold text-amber-200 tracking-wider">
-                  1–30
+                  KWENYE PAGE
                 </div>
               </div>
             </div>
