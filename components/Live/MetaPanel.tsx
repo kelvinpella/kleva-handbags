@@ -82,7 +82,7 @@ export default function MetaPanel({
             <div className="mt-auto">
               <div className="rounded-lg border border-amber-200/20 bg-black/30 p-2 text-center">
                 <div className="text-[12px] text-neutral-200 font-semibold">
-                  TIZAMA ZAIDI
+                  TIZAMA POCHI ZAIDI
                 </div>
                 <div className="text-[16px] font-bold text-amber-200 tracking-wider">
                   KWENYE PAGE
