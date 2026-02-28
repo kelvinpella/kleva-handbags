@@ -8,7 +8,11 @@ export function calculateRetailPrice(buyingPrice: number): number {
   if (!buyingPrice || buyingPrice <= 0) {
     return 0;
   }
-  return buyingPrice + 10000;
+  let additionalAmount = 10000;
+  if (buyingPrice > 50000) {
+    additionalAmount = 15000; // For higher-priced items, add a larger margin
+  }
+  return buyingPrice + additionalAmount;
 }
 
 /**
@@ -21,7 +25,7 @@ export function calculateWholesalePriceTZS(buyingPrice: number): number {
   if (!buyingPrice || buyingPrice <= 0) {
     return 0;
   }
-  return buyingPrice + 3000;
+  return buyingPrice + 5000;
 }
 
 /**
@@ -31,7 +35,10 @@ export function calculateWholesalePriceTZS(buyingPrice: number): number {
  * @param exchangeRate - The current TZS to USD exchange rate (required)
  * @returns The wholesale price in USD (whole number), or 0 if exchange rate is unavailable
  */
-export function calculateWholesalePriceUSD(buyingPrice: number, exchangeRate?: number): number {
+export function calculateWholesalePriceUSD(
+  buyingPrice: number,
+  exchangeRate?: number,
+): number {
   if (!buyingPrice || buyingPrice <= 0) {
     return 0;
   }

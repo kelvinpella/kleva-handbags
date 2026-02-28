@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-
+import { Handbag } from "@/typings";
 
 export async function loginAction(email: string, password: string) {
   const supabase = await createClient();
@@ -54,7 +54,7 @@ export async function uploadImage(
   file: File,
   condition: string,
   productId: string,
-  path?: string
+  path?: string,
 ): Promise<string | null> {
   try {
     const supabase = await createClient();
@@ -93,10 +93,10 @@ export async function uploadImage(
 export async function uploadMultipleImages(
   files: File[],
   condition: string,
-  productId: string
+  productId: string,
 ): Promise<string[]> {
   const uploadPromises = files.map((file) =>
-    uploadImage(file, condition, productId)
+    uploadImage(file, condition, productId),
   );
   const results = await Promise.all(uploadPromises);
   return results.filter((url): url is string => url !== null);
@@ -129,7 +129,7 @@ export async function deleteImage(path: string): Promise<boolean> {
  */
 export async function deleteProductImages(
   condition: string,
-  productId: string
+  productId: string,
 ): Promise<boolean> {
   try {
     const supabase = await createClient();
@@ -183,7 +183,7 @@ export async function getPublicUrl(path: string): Promise<string> {
   const url = new URL(
     `https://${
       process.env.NEXT_PUBLIC_SUPABASE_URL?.split("//")[1]
-    }/storage/v1/object/public/${BUCKET_NAME}/${path}`
+    }/storage/v1/object/public/${BUCKET_NAME}/${path}`,
   );
   return url.toString();
 }
@@ -231,7 +231,10 @@ export async function createProduct(productData: {
     return { success: true, id: data[0].id };
   } catch (error: any) {
     console.error("Create product error:", error);
-    return { success: false, error: error.message || "Failed to create product" };
+    return {
+      success: false,
+      error: error.message || "Failed to create product",
+    };
   }
 }
 
@@ -242,7 +245,7 @@ export async function fetchProducts(
   filter?: "all" | "new" | "second-hand",
   page: number = 1,
   itemsPerPage: number = 12,
-  searchQuery?: string
+  searchQuery?: string,
 ): Promise<{ success: boolean; data?: any[]; count?: number; error?: string }> {
   try {
     const supabase = await createClient();
@@ -261,7 +264,7 @@ export async function fetchProducts(
     // Add search filtering
     if (searchQuery && searchQuery.trim()) {
       query = query.or(
-        `name.ilike.%${searchQuery}%,brand.ilike.%${searchQuery}%`
+        `name.ilike.%${searchQuery}%,brand.ilike.%${searchQuery}%`,
       );
     }
 
@@ -278,7 +281,10 @@ export async function fetchProducts(
     return { success: true, data: data || [], count: count || 0 };
   } catch (error: any) {
     console.error("Fetch products error:", error);
-    return { success: false, error: error.message || "Failed to fetch products" };
+    return {
+      success: false,
+      error: error.message || "Failed to fetch products",
+    };
   }
 }
 
@@ -286,7 +292,7 @@ export async function fetchProducts(
  * Fetch a single product by ID
  */
 export async function fetchProductById(
-  id: string
+  id: string,
 ): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
     const supabase = await createClient();
@@ -309,7 +315,10 @@ export async function fetchProductById(
     return { success: true, data };
   } catch (error: any) {
     console.error("Fetch product error:", error);
-    return { success: false, error: error.message || "Failed to fetch product" };
+    return {
+      success: false,
+      error: error.message || "Failed to fetch product",
+    };
   }
 }
 
@@ -330,7 +339,7 @@ export async function updateProduct(
     retail_price?: number;
     wholesale_price_tzs?: number;
     wholesale_price_usd?: number;
-  }
+  },
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient();
@@ -351,7 +360,10 @@ export async function updateProduct(
     return { success: true };
   } catch (error: any) {
     console.error("Update product error:", error);
-    return { success: false, error: error.message || "Failed to update product" };
+    return {
+      success: false,
+      error: error.message || "Failed to update product",
+    };
   }
 }
 
@@ -359,7 +371,7 @@ export async function updateProduct(
  * Delete a product by ID
  */
 export async function deleteProduct(
-  id: string
+  id: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient();
@@ -403,7 +415,10 @@ export async function deleteProduct(
     return { success: true };
   } catch (error: any) {
     console.error("Delete product error:", error);
-    return { success: false, error: error.message || "Failed to delete product" };
+    return {
+      success: false,
+      error: error.message || "Failed to delete product",
+    };
   }
 }
 
@@ -503,7 +518,7 @@ export async function recordSale(saleData: {
 export async function fetchSales(
   filter?: "all" | "new" | "second-hand",
   page: number = 1,
-  itemsPerPage: number = 20
+  itemsPerPage: number = 20,
 ): Promise<{ success: boolean; data?: any[]; count?: number; error?: string }> {
   try {
     const supabase = await createClient();
@@ -539,7 +554,7 @@ export async function fetchSales(
  * Delete a sale record
  */
 export async function deleteSale(
-  id: string
+  id: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient();
@@ -605,7 +620,7 @@ export async function incrementSale(data: {
       quantity: data.quantity,
       buying_price: data.buyingPrice,
       selling_price: data.sellingPrice,
-      notes: `Sale recorded via products page (${data.quantity} item${data.quantity > 1 ? 's' : ''})`,
+      notes: `Sale recorded via products page (${data.quantity} item${data.quantity > 1 ? "s" : ""})`,
     });
 
     if (!saleResult.success) {
@@ -616,7 +631,7 @@ export async function incrementSale(data: {
     const { error: updateError } = await supabase
       .from("handbags")
       .update({
-        items_sold: currentItemsSold + data.quantity
+        items_sold: currentItemsSold + data.quantity,
       })
       .eq("id", data.productId);
 
@@ -670,7 +685,10 @@ export async function decrementSale(data: {
     const currentItemsSold = product?.items_sold || 0;
 
     if (currentItemsSold < data.quantity) {
-      return { success: false, error: `Cannot return ${data.quantity} items. Only ${currentItemsSold} items sold.` };
+      return {
+        success: false,
+        error: `Cannot return ${data.quantity} items. Only ${currentItemsSold} items sold.`,
+      };
     }
 
     // 2. Record the return as a negative sale in the sales table
@@ -681,7 +699,7 @@ export async function decrementSale(data: {
       quantity: -data.quantity, // Negative quantity represents a return
       buying_price: data.buyingPrice,
       selling_price: data.sellingPrice,
-      notes: `Return recorded via products page (${data.quantity} item${data.quantity > 1 ? 's' : ''} returned)`,
+      notes: `Return recorded via products page (${data.quantity} item${data.quantity > 1 ? "s" : ""} returned)`,
     });
 
     if (!returnResult.success) {
@@ -692,7 +710,7 @@ export async function decrementSale(data: {
     const { error: updateError } = await supabase
       .from("handbags")
       .update({
-        items_sold: Math.max(0, currentItemsSold - data.quantity)
+        items_sold: Math.max(0, currentItemsSold - data.quantity),
       })
       .eq("id", data.productId);
 
@@ -708,6 +726,33 @@ export async function decrementSale(data: {
     return { success: true };
   } catch (error: any) {
     console.error("Decrement sale error:", error);
-    return { success: false, error: error.message || "Failed to record return" };
+    return {
+      success: false,
+      error: error.message || "Failed to record return",
+    };
   }
+}
+
+export async function getLatestHandbags(): Promise<Handbag[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("handbags")
+    .select("brand, retail_price, images, created_at")
+    .order("created_at", { ascending: false })
+    .limit(20);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  // sanitize + ensure images exist
+  return (data ?? [])
+    .map((h) => ({
+      brand: String(h.brand ?? "Unknown"),
+      retail_price: h.retail_price ?? "",
+      images: Array.isArray(h.images) ? h.images.filter(Boolean) : [],
+      created_at: h.created_at,
+    }))
+    .filter((h) => h.images.length > 0) as Handbag[];
 }

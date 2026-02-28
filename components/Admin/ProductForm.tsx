@@ -312,7 +312,7 @@ export default function ProductForm({
             readOnly
           />
           <p className="mt-1 text-xs text-neutral-500">
-            Buying Price + TSh 10,000
+            Buying Price + TSh 10,000 / 15,000 (depending on price)
           </p>
         </div>
 
@@ -331,11 +331,11 @@ export default function ProductForm({
             value={initialData?.wholesale_price_tzs || ''}
             onChange={onInputChange}
             className="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent bg-neutral-50"
-            placeholder="Auto-calculated (Buying Price + 3,000)"
+            placeholder="Auto-calculated (Buying Price + 5,000)"
             readOnly
           />
           <p className="mt-1 text-xs text-neutral-500">
-            Buying Price + TSh 3,000
+            Buying Price + TSh 5,000
           </p>
         </div>
 
